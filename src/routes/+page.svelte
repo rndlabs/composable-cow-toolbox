@@ -59,7 +59,7 @@
 	}
 
 	import ErrorModal from '$lib/components/ErrorModal.svelte';
-	import UserAddress from '$lib/components/UserAddress.svelte';
+	// import UserAddress from '$lib/components/UserAddress.svelte';
 
 	// Dispatcher to show/hide the modal
 	const dispatch = createEventDispatcher();
@@ -84,7 +84,7 @@
 </script>
 
 <main>
-	<UserAddress walletAddress={userWalletAddress} />
+	<!-- <UserAddress walletAddress={userWalletAddress} /> -->
 
 	<div class="form-container">
 		<div class="form-header">Quote request Form</div>
