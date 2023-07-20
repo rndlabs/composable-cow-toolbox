@@ -8,26 +8,15 @@
 		OrderSigningUtils,
 		SupportedChainId
 	} from '@cowprotocol/cow-sdk';
-
-    import SafeAppsSDK from '@safe-global/safe-apps-sdk'
+	import type SafeAppsSDK from '@safe-global/safe-apps-sdk/dist/src/sdk';
 
 	import QuoteForm from '$lib/components/QuoteForm.svelte';
+	import ErrorModal from '$lib/components/ErrorModal.svelte';
+	import UserAddress from '$lib/components/UserAddress.svelte';
+	import Connect from '$lib/components/web3/Connect.svelte';
+	import BlockNumber from '$lib/components/web3/BlockNumber.svelte';
 
-	type Opts = {
-		allowedDomains?: RegExp[];
-		debug?: boolean;
-	};
-
-	const opts: Opts = {
-		allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
-		debug: false
-	};
-
-	const appsSdk = new SafeAppsSDK(opts);
-
-	onMount(async () => {
-		// await main();
-	});
+    let safe: SafeAppsSDK;
 
 	const account = '0xE618050F1adb1F6bb7d03A3484346AC42F3E71EE';
 	const chainId = 5; // Goerli
@@ -58,8 +47,6 @@
 		// console.log('Results: ', { orderId, order, trades, orderCancellationSigningResult, cancellationResult })
 	}
 
-	import ErrorModal from '$lib/components/ErrorModal.svelte';
-	// import UserAddress from '$lib/components/UserAddress.svelte';
 
 	// Dispatcher to show/hide the modal
 	const dispatch = createEventDispatcher();
@@ -84,7 +71,10 @@
 </script>
 
 <main>
-	<!-- <UserAddress walletAddress={userWalletAddress} /> -->
+    <!-- {#if safeInfo}
+    	<UserAddress address={safeInfo.safeAddress} />
+    {/if} -->
+	<Connect />
 
 	<div class="form-container">
 		<div class="form-header">Quote request Form</div>
@@ -95,6 +85,8 @@
 		<!-- Show the ErrorModal if the modal is open -->
 		<ErrorModal {errorMessage} onClose={closeModal} />
 	{/if}
+
+	<BlockNumber />
 </main>
 
 <style>

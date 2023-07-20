@@ -1,7 +1,5 @@
-declare module 'jazzicon' {
-    import { HTMLCanvasElement } from 'canvas';
-  
-    export function createIcon(diameter: number, seed: number): HTMLCanvasElement;
-    export function createCanvas(diameter: number, seed: number): HTMLCanvasElement;
+declare module '@metamask/jazzicon' {
+    export default function generateIdenticon(diameter: number, seed: number): HTMLElement;
+    // Declare other functions if needed
   }
   
