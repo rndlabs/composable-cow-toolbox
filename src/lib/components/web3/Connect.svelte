@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-    import { init, rpc } from '$lib/store/chain';
-	import { safe, safeInfo, safeSettings, connected, signerAddress } from '$lib/store/safe';
-	import SafeAppsSDK, { type Opts } from '@safe-global/safe-apps-sdk';
-	import Address from '../Address.svelte';
-	import JazzIcon from './JazzIcon.svelte';
+	import { init } from '$lib/store/chain';
+	import { safeApp as safeAppStore, safeInfo, connected } from '$lib/store/safe';
+	import type { Opts } from '@rndlabs/safe-apps-sdk';
+	import { setError } from '$lib/store/error';
+	import SafeAppsSDK from '@rndlabs/safe-apps-sdk/dist/src/sdk';
 
 	let pending = false;
 
@@ -17,109 +17,43 @@
 				debug: false
 			};
 
-			const _safe = new SafeAppsSDK(opts);
+			const safeApp = new SafeAppsSDK(opts);
 
 			// set the settings on the safe for off-chain signing
-			const currentSettings = await _safe.eth.setSafeSettings([{
-				offChainSigning: true
-			}]);
+			await safeApp.eth.setSafeSettings([
+				{
+					offChainSigning: true
+				}
+			]);
 
-			safe.set(_safe);
-            safeSettings.set(currentSettings);
+			safeAppStore.set(safeApp);
+			// safeSettings.set(currentSettings);
 
-            // spawn a listener for the safe info
-            // this is used to determine when to init the chain
-            const unsubscriber = safeInfo.subscribe((info) => {
-                if (info) {
-                    init(info.chainId)
-                }
-            });
+			// spawn a listener for the safe info
+			// this is used to determine when to init the chain
+			const unsubscriber = safeInfo.subscribe((info) => {
+				if (info) {
+					init(info.chainId);
+				}
+			});
 
-            // create a timer to watch for the safe to be connected
-            // if it doesn't connect within 5 seconds, throw an error
-            setTimeout(() => {
-                if (!$connected) {
-                    throw new Error('Safe not connected');
-                }
-                unsubscriber();
-            }, 5000);
-		} catch (e) {
-			console.error(e);
+			// create a timer to watch for the safe to be connected
+			// if it doesn't connect within 5 seconds, throw an error
+			setTimeout(() => {
+				if (!$connected) {
+					setError('Error connecting to safe!');
+				}
+				unsubscriber();
+			}, 5000);
+		} catch (e: any) {
+			setError('Unknown error: ' + e.message);
 		}
 		pending = false;
 	};
 
-	const disconnect = async () => {};
-
-    onMount(async () => {
-        await connect();
-    });
+	onMount(async () => {
+		await connect();
+	});
 </script>
 
-<div class="top-bar-connect">
-    {#if $connected && $signerAddress}
-      <div class="address-container">
-        <div class="jazzicon-container">
-          <JazzIcon size={24} address={$signerAddress} />
-        </div>
-        <Address address={$signerAddress} />
-      </div>
-    {:else}
-      <button class="connect-button" on:click={() => connect()}>Connect Safe</button>
-    {/if}
-  </div>
-  
-  <style>
-    .top-bar-connect {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      align-items: center;
-    }
-  
-    .address-container {
-      display: flex;
-      align-items: center;
-      background-color: #ffffff;
-      border-radius: 20px;
-      padding: 5px 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-  
-    .jazzicon-container {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      margin-right: 8px;
-    }
-  
-    .jazzicon-container svg {
-      width: 100%;
-      height: 100%;
-    }
-  
-    .address-text {
-      font-size: 14px;
-      font-weight: bold;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  
-    .connect-button {
-      background-color: #007bff;
-      color: #ffffff;
-      border: none;
-      border-radius: 20px;
-      padding: 8px 15px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-  
-    .connect-button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+<slot />
