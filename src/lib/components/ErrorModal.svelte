@@ -1,17 +1,16 @@
 <!-- ErrorModal.svelte -->
 <script lang="ts">
-	export let errorMessage: any;
-	export let onClose: () => void;
+	import { error, clearError } from "$lib/store/error";
 
 	function handleClose() {
-		onClose();
+		clearError();
 	}
 </script>
 
 <div class="modal-overlay">
 	<div class="modal-content">
 		<span class="close" on:click={handleClose}>&times;</span>
-		<p>{errorMessage}</p>
+		<p>{$error}</p>
 	</div>
 </div>
 
