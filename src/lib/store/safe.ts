@@ -1,16 +1,17 @@
-import type SafeSettings from '@safe-global/safe-apps-sdk';
-import type { SafeInfo } from '@safe-global/safe-apps-sdk';
-import type SafeAppsSDK from '@safe-global/safe-apps-sdk';
+import type { SafeInfo } from '@rndlabs/safe-apps-sdk';
+import type SafeAppsSDK from '@rndlabs/safe-apps-sdk';
+import { Safe, EthersAdapter } from '@rndlabs/safe-protocol-kit';
 import { derived, get, writable, type Readable } from 'svelte/store';
 import { rpc } from './chain';
+import { ethers } from 'ethers';
+import { setError } from './error';
 
 // safe
-const safe = writable<SafeAppsSDK | undefined>(undefined);
-const safeSettings = writable<SafeSettings | undefined>(undefined);
+const safeApp = writable<SafeAppsSDK | undefined>(undefined);
 
 // If the safe becomes defined, then we get the info.
 const safeInfo: Readable<SafeInfo | undefined> = derived(
-    [safe],
+    [safeApp],
     ([$safe], set) => {
         if ($safe) {
             $safe.safe.getInfo().then((info) => {
@@ -24,8 +25,26 @@ const safeInfo: Readable<SafeInfo | undefined> = derived(
     }
 )
 
-const connected = derived(
-    [safe],
+const safe: Readable<Safe | undefined> = derived(
+    [safeInfo, rpc],
+    ([$info, $rpc], set) => {
+        if ($info && $rpc) {
+            Safe.create({ 
+                safeAddress: $info.safeAddress,
+                ethAdapter: new EthersAdapter({ ethers, signerOrProvider: $rpc })
+            }).then((safe) => {
+                set(safe)
+            }).catch((e) => {
+                setError(e)
+            })
+        } else {
+            set(undefined)
+        }
+    }
+)
+
+const connected: Readable<boolean> = derived(
+    [safeApp],
     ([$safe], set) => {
         if ($safe) {
             set(true)
@@ -46,19 +65,4 @@ const signerAddress: Readable<string | undefined> = derived(
     }
 )
 
-// const ensOrAddress = derived(
-//     [safeInfo, rpc],
-
-// // $: ensOrAddress = async () => {
-// //     if ($rpc && $safeInfo) {
-// //         const ens = await $rpc.lookupAddress($safeInfo.safeAddress);
-// //         return ens || formatAddress($safeInfo.safeAddress);
-// //     } else {
-// //         return 'Not connected';
-// //     }
-// // };
-
-// // safe settings
-// const safeSettings = writable<SafeSettings | undefined>(undefined)
-
-export { safe, safeInfo, safeSettings, connected, signerAddress }
+export { safe, safeApp, safeInfo, connected, signerAddress }
