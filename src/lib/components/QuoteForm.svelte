@@ -1,20 +1,14 @@
 <!-- QuoteForm.svelte -->
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { BigNumber, utils } from 'ethers';
 	import TokenField from './TokenField.svelte';
-
-	// Define the QuoteRequest type to represent the shape of the form data
-	interface QuoteRequest {
-		sellToken: string;
-		buyToken: string;
-		from: string;
-		receiver: string;
-		sellAmountBeforeFee: string;
-		kind: string;
-	}
+	import type { OrderQuoteRequest } from '@cowprotocol/cow-sdk';
+	import { setError } from '$lib/store/error';
+	import { init } from '$lib/store/tokens';
 
 	// Define the type for the onSubmit prop function
-	type OnSubmitHandler = (quoteRequest: QuoteRequest) => void;
+	type OnSubmitHandler = (quoteRequest: OrderQuoteRequest) => void;
 
 	export let onSubmit: OnSubmitHandler;
 	let sellToken = '';
@@ -22,7 +16,8 @@
 	let from = '';
 	let receiver = '';
 	let sellAmountBeforeFee = '';
-	let kind = '';
+	let buyAmountBeforeFee = '';
+	let kind = 'sell';
 
 	// Define the list of available tokens
 	const availableTokens = [
@@ -43,42 +38,69 @@
 		// Add more kinds as needed
 	];
 
+	function handleKindChange(event: Event) {
+		kind = (event.target as HTMLSelectElement).value;
+
+		// Reset the sellAmountBeforeFee and buyAmountBeforeFee fields
+		sellAmountBeforeFee = '';
+		buyAmountBeforeFee = '';
+	}
+
 	function handleSubmit() {
 		// Validate 'from' and 'receiver' as valid Ethereum addresses using ethers
 		try {
 			from = utils.getAddress(from);
 			receiver = utils.getAddress(receiver);
 		} catch (error) {
-			alert('Please enter a valid Ethereum address.');
+			setError('Please enter a valid Ethereum address.');
 			return;
 		}
 
 		// Validate 'sellAmountBeforeFee' as a valid BigNumber using ethers
-		try {
-			const bigNumberSellAmount = BigNumber.from(sellAmountBeforeFee);
-			if (bigNumberSellAmount.lte(0)) {
-				alert('Please enter a valid positive number for "Sell Amount Before Fee" field.');
+		if (kind === 'sell') {
+			try {
+				const bigNumberSellAmount = BigNumber.from(sellAmountBeforeFee);
+				if (bigNumberSellAmount.lte(0)) {
+					setError('Please enter a valid positive number for "Sell Amount Before Fee" field.');
+					return;
+				}
+				sellAmountBeforeFee = bigNumberSellAmount.toString(); // Normalize the BigNumber representation
+			} catch (error) {
+				setError('Please enter a valid positive number for "Sell Amount Before Fee" field.');
 				return;
 			}
-			sellAmountBeforeFee = bigNumberSellAmount.toString(); // Normalize the BigNumber representation
-		} catch (error) {
-			alert('Please enter a valid number for "Sell Amount Before Fee" field.');
-			return;
+		} else {
+			try {
+				const bigNumberBuyAmount = BigNumber.from(buyAmountBeforeFee);
+				if (bigNumberBuyAmount.lte(0)) {
+					setError('Please enter a valid positive number for "Buy Amount Before Fee" field.');
+					return;
+				}
+				buyAmountBeforeFee = bigNumberBuyAmount.toString(); // Normalize the BigNumber representation
+			} catch (error) {
+				setError('Please enter a valid positive number for "Buy Amount Before Fee" field.');
+				return;
+			}
 		}
 
-		const quoteRequest: QuoteRequest = {
+		const quoteRequest: OrderQuoteRequest = {
 			sellToken,
 			buyToken,
 			from,
 			receiver,
 			sellAmountBeforeFee,
-			kind
+			kind: kind as OrderQuoteRequest['kind']
 		};
 		onSubmit(quoteRequest);
 	}
+
+	onMount(async () => {
+		// make sure the tokens are initialized
+		init();
+	});
 </script>
 
-<main>
+<div>
 	<form on:submit|preventDefault={handleSubmit}>
 		<!-- Sell Token -->
 		<div class="form-row">
@@ -100,13 +122,20 @@
 			<label for="receiver">Receiver:</label>
 			<input type="text" id="receiver" bind:value={receiver} required />
 		</div>
-		<div class="form-row">
-			<label for="sellAmountBeforeFee">Sell Amount Before Fee:</label>
-			<input type="text" id="sellAmountBeforeFee" bind:value={sellAmountBeforeFee} required />
-		</div>
+		{#if kind === 'sell'}
+			<div class="form-row">
+				<label for="sellAmountBeforeFee">Sell Amount (before fee):</label>
+				<input type="text" id="sellAmountBeforeFee" bind:value={sellAmountBeforeFee} required />
+			</div>
+		{:else}
+			<div class="form-row">
+				<label for="buyAmountBeforeFee">Buy Amount (before fee):</label>
+				<input type="text" id="buyAmountBeforeFee" bind:value={buyAmountBeforeFee} required />
+			</div>
+		{/if}
 		<div class="form-row">
 			<label for="kind">Kind:</label>
-			<select id="kind" bind:value={kind} required>
+			<select id="kind" bind:value={kind} on:change={handleKindChange} required>
 				{#each kinds as k}
 					<option value={k}>{k}</option>
 				{/each}
@@ -116,7 +145,7 @@
 			<button type="submit">Submit</button>
 		</div>
 	</form>
-</main>
+</div>
 
 <style>
 	/* Styling for form rows, labels, inputs, and button */
@@ -134,7 +163,7 @@
 		width: 100%;
 		padding: 0.5rem;
 		font-size: 1rem;
-        box-sizing: border-box; /* Add this line */
+		box-sizing: border-box; /* Add this line */
 	}
 
 	button {
