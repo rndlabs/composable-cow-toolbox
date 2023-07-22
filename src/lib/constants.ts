@@ -32,3 +32,9 @@ export const BLOCK_TIME: { [chainId in SupportedChainId]?: number } = {
     [SupportedChainId.GOERLI]: 12,
     [SupportedChainId.GNOSIS_CHAIN]: 5,
 }
+
+export const TOKEN_LISTS = [
+    'https://files.cow.fi/tokens/CowSwap.json',
+    'https://tokens.honeyswap.org',
+    'https://raw.githubusercontent.com/cowprotocol/cowswap/develop/src/tokens/goerli-token-list.json',
+]
