@@ -4,4 +4,9 @@ import basicSsl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig({
 	plugins: [sveltekit(), basicSsl()],
+	define: {
+		// stupid shims that love to destroy your day
+		'global.crypto': undefined,
+		'process.env': {}
+	},
 });
