@@ -6,18 +6,20 @@ import { writable } from 'svelte/store';
 const NUM_BLOCKS = 3;
 
 // provider
-const rpc = writable<providers.StaticJsonRpcProvider | undefined>(undefined);
+const rpc = writable<providers.JsonRpcProvider | undefined>(undefined);
 const blockNumber = writable<number | null>(undefined);
+const chainId = writable<SupportedChainId | null>(undefined);
 
 let timerHandle: NodeJS.Timeout | undefined = undefined;
 
-export async function init(chainId: SupportedChainId): Promise<void> {
+export async function init(_chainId: SupportedChainId): Promise<void> {
     // set the provider based on the chainId
-    const provider = new providers.StaticJsonRpcProvider(RPC_URLS[chainId]!);
+    const provider = new providers.StaticJsonRpcProvider(RPC_URLS[_chainId]!);
 
     // set the provider
     rpc.set(provider);
     blockNumber.set(await provider.getBlockNumber());
+    chainId.set(_chainId);
 }
 
 // On any change to the provider, restart the block monitoring
@@ -40,4 +42,4 @@ rpc.subscribe(async (provider) => {
     }
 });
 
-export { rpc, blockNumber };
+export { rpc, blockNumber, chainId };
