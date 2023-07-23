@@ -1,5 +1,4 @@
 <script lang="ts">
-	const global = {};
 	import { hasError } from '$lib/store/error';
 
 	import ErrorModal from '$lib/components/ErrorModal.svelte';
@@ -11,18 +10,16 @@
 <Connect>
 	<TopBar>
 		<div class="navbar">
-			<a href="/" class="nav-item">Home</a>
+			<!-- <a href="/" class="nav-item">Home</a>
 			<a href="/info" class="nav-item">Safe Info</a>
 			<a href="/setup" class="nav-item">Setup</a>
 			<a href="/simple-swap" class="nav-item">Off-chain Signing</a>
 			<a href="/conditional-order" class="nav-item">Create Conditional Order</a>
-			<a href="/multi-conditional-order" class="nav-item">Multi Conditional Order</a>
+			<a href="/multi-conditional-order" class="nav-item">Multi Conditional Order</a> -->
 		</div>
 	</TopBar>
 	<main>
-		<div class="form-container">
-			<slot />
-		</div>
+		<slot />
 	</main>
 	<Footer />
 
@@ -46,11 +43,7 @@
 		justify-content: center;
 		align-items: center;
 		height: 100vh;
-	}
-
-	/* Style for the form container */
-	.form-container {
-		width: 400px;
+		overflow: hidden; /* Hide any overflow from the form-container */
 	}
 
 	/* Navbar item (pill-like button) */

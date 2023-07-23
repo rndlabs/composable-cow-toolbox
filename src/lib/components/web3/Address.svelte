@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { safe, safeInfo } from '$lib/store/safe';
+	import { safeInfo } from '$lib/store/safe';
 	import { formatAddress } from '$lib/utils';
 	import { rpc, chainId } from '$lib/store/chain';
 	import { SupportedChainId } from '@cowprotocol/cow-sdk';
@@ -27,9 +27,9 @@
 	};
 </script>
 
-<div class="link-container">
+<span class="link-container">
 	{#if address}
-		{#await ensOrAddress()}{formatAddress(address)}{:then name}{name}{/await}
+		<tt>{#await ensOrAddress()}{formatAddress(address)}{:then name}{name}{/await}</tt>
 		{#if showExplorer && $chainId && EXPLORER_URLS[$chainId]?.address}
 			<a
 				href={EXPLORER_URLS[$chainId]?.address(address) || '#'}
@@ -43,18 +43,18 @@
 	{:else}
 		Connect Wallet
 	{/if}
-</div>
+</span>
 
 <style>
 	.link-container {
-	  display: flex;
-	  align-items: center; /* Align items vertically */
+		display: flex;
+		align-items: center; /* Align items vertically */
 	}
-  
+
 	.external-link-icon {
-	  width: 20px; /* Set the width of the image */
-	  height: 20px; /* Set the height of the image */
-	  margin-left: 5px; /* Add some margin on the left side of the image to create spacing between the text and the image */
-	  /* You can adjust the width, height, and margin values as needed to achieve the desired appearance */
+		width: 20px; /* Set the width of the image */
+		height: 20px; /* Set the height of the image */
+		margin-left: 5px; /* Add some margin on the left side of the image to create spacing between the text and the image */
+		/* You can adjust the width, height, and margin values as needed to achieve the desired appearance */
 	}
-  </style>
+</style>
