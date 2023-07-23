@@ -1,6 +1,7 @@
-import { writable } from 'svelte/store';
-import { chainId } from './chain';
-import { OrderSigningUtils } from '@cowprotocol/cow-sdk';
+import { derived, writable } from 'svelte/store';
+import { chainId, rpc } from './chain';
+import { signerAddress } from './safe';
+import { OrderSigningUtils, getDomainVerifier } from '@cowprotocol/cow-sdk';
 
 const domainSeparator = writable<string | undefined>(undefined);
 
@@ -15,4 +16,16 @@ chainId.subscribe(async (chainId) => {
 	domainSeparator.set(undefined);
 });
 
-export { domainSeparator };
+const domainVerifier = derived(
+	[domainSeparator, rpc, signerAddress, chainId],
+	async ([$domainSeparator, $rpc, $signerAddress, $chainId]) => {
+		if (!$domainSeparator || !$rpc || !$signerAddress || !$chainId) {
+			return undefined;
+		}
+
+		// Retrieve the domain verifier for the GPv2Settlement domain.
+		return getDomainVerifier($signerAddress, $domainSeparator, $chainId, $rpc);
+	}
+)
+
+export { domainSeparator, domainVerifier };
