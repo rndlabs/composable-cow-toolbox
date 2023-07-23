@@ -9,4 +9,10 @@ export default defineConfig({
 		'global.crypto': undefined,
 		'process.env': {}
 	},
+	resolve: {
+		alias: {
+			// this is required for the browser build
+			'node-fetch': 'cross-fetch',
+		},
+	},
 });
