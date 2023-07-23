@@ -43,6 +43,21 @@ const safe: Readable<Safe | undefined> = derived(
     }
 )
 
+const fallbackHandler: Readable<string | undefined> = derived(
+    [safe],
+    ([$safe], set) => {
+        if ($safe) {
+            $safe.getFallbackHandler().then((handler) => {
+                set(handler)
+            }).catch((e) => {
+                throw new Error(e)
+            })
+        } else {
+            set(undefined)
+        }
+    }
+)
+
 const connected: Readable<boolean> = derived(
     [safeApp],
     ([$safe], set) => {
@@ -65,4 +80,4 @@ const signerAddress: Readable<string | undefined> = derived(
     }
 )
 
-export { safe, safeApp, safeInfo, connected, signerAddress }
+export { safe, safeApp, safeInfo, fallbackHandler, connected, signerAddress }

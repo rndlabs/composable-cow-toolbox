@@ -16,10 +16,13 @@ export async function init(_chainId: SupportedChainId): Promise<void> {
     // set the provider based on the chainId
     const provider = new providers.StaticJsonRpcProvider(RPC_URLS[_chainId]!);
 
-    // set the provider
-    rpc.set(provider);
-    blockNumber.set(await provider.getBlockNumber());
-    chainId.set(_chainId);
+    // wait to be ready
+    provider.ready.then(async () => {
+        // set the provider
+        chainId.set(_chainId);
+        rpc.set(provider);
+        blockNumber.set(await provider.getBlockNumber());
+    })
 }
 
 // On any change to the provider, restart the block monitoring
