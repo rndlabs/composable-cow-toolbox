@@ -3,32 +3,29 @@
 	import Address from '$lib/components/web3/Address.svelte';
 	import { rpc, chainId } from '$lib/store/chain';
 	import { safe, signerAddress, fallbackHandler } from '$lib/store/safe';
-  import { domainSeparator } from '$lib/store/cow';
+	import { domainSeparator } from '$lib/store/cow';
 	import { getDomainVerifier, isExtensibleFallbackHandler } from '@cowprotocol/cow-sdk';
-	import { goto } from '$app/navigation';
 
 	let domainVerifier: string | boolean | undefined;
 
-	let handlerCheck = ($fallbackHandler && $chainId && isExtensibleFallbackHandler($fallbackHandler, $chainId)) || false;
+	let handlerCheck =
+		($fallbackHandler && $chainId && isExtensibleFallbackHandler($fallbackHandler, $chainId)) ||
+		false;
 
-  domainSeparator.subscribe(async (value) => {
-    if (value && $signerAddress && $chainId && $rpc) {
-      getDomainVerifier($signerAddress, value, $chainId, $rpc).then((verifier) => {
-        console.log('domain verifier', verifier);
-        domainVerifier = verifier;
-      });
-    }
-  });
+	domainSeparator.subscribe(async (value) => {
+		if (value && $signerAddress && $chainId && $rpc) {
+			getDomainVerifier($signerAddress, value, $chainId, $rpc).then((verifier) => {
+				console.log('domain verifier', verifier);
+				domainVerifier = verifier;
+			});
+		}
+	});
 </script>
 
 <WizardPage
 	title="🐮🎶 Composable CoW Toolbox 🧰"
-	showButtonLeft={true}
-	buttonTextLeft="Back"
-	on:button-click-left={() => goto('/')}
-	showButtonRight={true}
-	buttonTextRight="Setup"
-	on:button-click-right={() => goto('/setup')}
+	leftButton={{ text: 'Back', uri: '/' }}
+	rightButton={{ text: 'Next', uri: '/setup' }}
 >
 	<h2>Diagnostic Information</h2>
 	{#if safe && signerAddress && $chainId}

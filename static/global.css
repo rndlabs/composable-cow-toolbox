@@ -8,62 +8,62 @@ h3,
 p,
 ul,
 li {
-    margin: 0;
-    padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 /* Set a uniform font family for the entire project */
 body {
-    font-family: Arial, sans-serif;
+	font-family: Arial, sans-serif;
 }
 
 /* Define some basic styles for containers */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 20px;
 }
 
 /* Add global styles for buttons */
 button {
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    padding: 8px 12px;
-    border: none;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
+	font-family: Arial, sans-serif;
+	font-size: 16px;
+	padding: 8px 12px;
+	border: none;
+	background-color: #007bff;
+	color: #fff;
+	border-radius: 4px;
+	cursor: pointer;
 }
 
 /* Add global styles for input fields */
 input {
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+	font-family: Arial, sans-serif;
+	font-size: 16px;
+	padding: 8px 12px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
 }
 
 /* Add global styles for links */
 a {
-    color: #007bff;
-    text-decoration: none;
+	color: #007bff;
+	text-decoration: none;
 }
 
 /* Add global styles for headings */
 h1,
 h2,
 h3 {
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    margin-bottom: 10px;
+	font-family: Arial, sans-serif;
+	font-weight: bold;
+	margin-bottom: 10px;
 }
 
 /* Add global styles for paragraphs */
 p {
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
-    margin-bottom: 10px;
+	font-family: Arial, sans-serif;
+	font-size: 16px;
+	line-height: 1.6;
+	margin-bottom: 10px;
 }

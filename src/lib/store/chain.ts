@@ -13,36 +13,36 @@ const chainId = writable<SupportedChainId | null>(undefined);
 let timerHandle: NodeJS.Timeout | undefined = undefined;
 
 export async function init(_chainId: SupportedChainId): Promise<void> {
-    // set the provider based on the chainId
-    const provider = new providers.StaticJsonRpcProvider(RPC_URLS[_chainId]!);
+	// set the provider based on the chainId
+	const provider = new providers.StaticJsonRpcProvider(RPC_URLS[_chainId]!);
 
-    // wait to be ready
-    provider.ready.then(async () => {
-        // set the provider
-        chainId.set(_chainId);
-        rpc.set(provider);
-        blockNumber.set(await provider.getBlockNumber());
-    })
+	// wait to be ready
+	provider.ready.then(async () => {
+		// set the provider
+		chainId.set(_chainId);
+		rpc.set(provider);
+		blockNumber.set(await provider.getBlockNumber());
+	});
 }
 
 // On any change to the provider, restart the block monitoring
 rpc.subscribe(async (provider) => {
-    if (provider) {
-        const network = await provider.getNetwork();
-        const blockTime = BLOCK_TIME[network.chainId as keyof typeof BLOCK_TIME] || 12;
+	if (provider) {
+		const network = await provider.getNetwork();
+		const blockTime = BLOCK_TIME[network.chainId as keyof typeof BLOCK_TIME] || 12;
 
-        // clear the old timer
-        if (timerHandle) {
-            clearInterval(timerHandle);
-        }
+		// clear the old timer
+		if (timerHandle) {
+			clearInterval(timerHandle);
+		}
 
-        // run block monitoring for each block
-        timerHandle = setInterval(async () => {
-            if (document.visibilityState === 'visible') {
-                blockNumber.set(await provider.getBlockNumber());
-            }
-        }, NUM_BLOCKS * blockTime * 1000);
-    }
+		// run block monitoring for each block
+		timerHandle = setInterval(async () => {
+			if (document.visibilityState === 'visible') {
+				blockNumber.set(await provider.getBlockNumber());
+			}
+		}, NUM_BLOCKS * blockTime * 1000);
+	}
 });
 
 export { rpc, blockNumber, chainId };

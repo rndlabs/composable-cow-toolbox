@@ -2,12 +2,8 @@
 	import {
 		OrderBookApi,
 		SupportedChainId,
-
 		type OrderQuoteRequest,
-
 		type OrderQuoteResponse
-
-
 	} from '@cowprotocol/cow-sdk';
 
 	import QuoteForm from '$lib/components/QuoteForm.svelte';

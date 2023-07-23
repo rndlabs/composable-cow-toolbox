@@ -1,6 +1,6 @@
 <!-- ErrorModal.svelte -->
 <script lang="ts">
-	import { error, clearError } from "$lib/store/error";
+	import { error, clearError } from '$lib/store/error';
 
 	function handleClose() {
 		clearError();

@@ -1,12 +1,12 @@
 <!-- TokenField.svelte -->
 <script lang="ts">
-    interface Token {
-      value: string;
-      label: string;
-    }
-  
-    export let tokens: Token[];
-    export let selectedToken: string = '';
+	interface Token {
+		value: string;
+		label: string;
+	}
+
+	export let tokens: Token[];
+	export let selectedToken: string = '';
 </script>
 
 <label>
