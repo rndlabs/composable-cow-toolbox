@@ -5,6 +5,8 @@
 	import Connect from '$lib/components/web3/Connect.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
+
+	export const ssr = false;
 </script>
 
 <Connect>
