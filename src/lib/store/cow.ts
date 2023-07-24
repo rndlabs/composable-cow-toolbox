@@ -1,6 +1,5 @@
 import { derived, writable } from 'svelte/store';
-import { chainId, rpc } from './chain';
-import { signerAddress } from './safe';
+import { chainId, rpc, signerAddress } from './chain';
 import { OrderSigningUtils, getDomainVerifier } from '@cowprotocol/cow-sdk';
 
 const domainSeparator = writable<string | undefined>(undefined);

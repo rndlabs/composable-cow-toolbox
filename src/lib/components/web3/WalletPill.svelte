@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { signerAddress } from '$lib/store/safe';
+	import { signerAddress } from '$lib/store/chain';
 
 	import Address from '$lib/components/web3/Address.svelte';
 	import JazzIcon from '$lib/components/web3/JazzIcon.svelte';

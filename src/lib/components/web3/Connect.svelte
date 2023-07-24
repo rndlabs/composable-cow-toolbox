@@ -1,17 +1,20 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { init } from '$lib/store/chain';
-	import { safeApp as safeAppStore, safeInfo, connected } from '$lib/store/safe';
-	import type { Opts } from '@rndlabs/safe-apps-sdk';
-	import { setError } from '$lib/store/error';
+	import { safeApp as safeAppStore, safeInfo as safeInfoStore } from '$lib/store/safe';
+	import type { Opts, SafeInfo } from '@rndlabs/safe-apps-sdk';
 	import SafeAppsSDK from '@rndlabs/safe-apps-sdk/dist/src/sdk';
 
 	let pending = false;
+	let triedToConnectToSafe = false;
 
 	// Attempt to connect to the safe
 	const connect = async () => {
 		pending = true;
-		try {
+		// try {
+
+			let safeInfo: SafeInfo | undefined = undefined;
+
 			const opts: Opts = {
 				allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
 				debug: false
@@ -19,35 +22,42 @@
 
 			const safeApp = new SafeAppsSDK(opts);
 
-			// set the settings on the safe for off-chain signing
-			await safeApp.eth.setSafeSettings([
-				{
-					offChainSigning: true
-				}
-			]);
+			// code adapted from `safe-apps-web3modal`
+			if (!$safeAppStore && !triedToConnectToSafe) {
+				safeInfo = await safeApp.safe.getInfo();
+				// TODO: At the moment, for some reason, `safe.getInfo()` hangs forever but
+				//       we can await it?!?!
+				// safeInfo = await Promise.race([
+				// 	safeApp.safe.getInfo(),
+				// 	new Promise<undefined>((resolve) => {
+				// 		setTimeout(() => {
+				// 			console.log('safe.getInfo() timed out');
+				// 			resolve(undefined);
+				// 		}, 20000);
+				// 	})
+				// ]);
+				triedToConnectToSafe = true;
+			}
 
-			safeAppStore.set(safeApp);
-			// safeSettings.set(currentSettings);
+			// if safeInfo is defined, we connected to the safe
+			if (safeInfo) {
+				// set the settings on the safe for off-chain signing
+				await safeApp.eth.setSafeSettings([
+					{
+						offChainSigning: true
+					}
+				]);
 
-			// spawn a listener for the safe info
-			// this is used to determine when to init the chain
-			const unsubscriber = safeInfo.subscribe((info) => {
-				if (info) {
-					init(info.chainId);
-				}
-			});
+				// set the safe stores
+				safeAppStore.set(safeApp);
+				safeInfoStore.set(safeInfo);
 
-			// create a timer to watch for the safe to be connected
-			// if it doesn't connect within 5 seconds, throw an error
-			setTimeout(() => {
-				if (!$connected) {
-					setError('Error connecting to safe!');
-				}
-				unsubscriber();
-			}, 5000);
-		} catch (e: any) {
-			setError('Unknown error: ' + e.message);
-		}
+				// now that we have the safe info, we can initialize the chain
+				init(safeInfo.chainId, safeInfo.safeAddress);
+			}
+		// } catch (e: any) {
+		// 	setError('Unknown error: ' + e.message);
+		// }
 		pending = false;
 	};
 

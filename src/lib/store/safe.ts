@@ -8,22 +8,7 @@ import { setError } from './error';
 
 // safe
 const safeApp = writable<SafeAppsSDK | undefined>(undefined);
-
-// If the safe becomes defined, then we get the info.
-const safeInfo: Readable<SafeInfo | undefined> = derived([safeApp], ([$safe], set) => {
-	if ($safe) {
-		$safe.safe
-			.getInfo()
-			.then((info) => {
-				set(info);
-			})
-			.catch((e) => {
-				throw new Error(e);
-			});
-	} else if (get(safeInfo)) {
-		set(undefined);
-	}
-});
+const safeInfo = writable<SafeInfo | undefined>(undefined);
 
 const safe: Readable<Safe | undefined> = derived([safeInfo, rpc], ([$info, $rpc], set) => {
 	if ($info && $rpc) {
@@ -57,20 +42,6 @@ const fallbackHandler: Readable<string | undefined> = derived([safe], ([$safe], 
 	}
 });
 
-const connected: Readable<boolean> = derived([safeApp], ([$safe], set) => {
-	if ($safe) {
-		set(true);
-	} else {
-		set(false);
-	}
-});
 
-const signerAddress: Readable<string | undefined> = derived([safeInfo], ([$safeInfo], set) => {
-	if ($safeInfo) {
-		set($safeInfo.safeAddress);
-	} else {
-		set(undefined);
-	}
-});
 
-export { safe, safeApp, safeInfo, fallbackHandler, connected, signerAddress };
+export { safe, safeApp, safeInfo, fallbackHandler };

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import WizardPage from '$lib/components/WizardPage.svelte';
 	import Address from '$lib/components/web3/Address.svelte';
-	import { rpc, chainId } from '$lib/store/chain';
-	import { safe, signerAddress, fallbackHandler } from '$lib/store/safe';
-	import { domainSeparator } from '$lib/store/cow';
+	import { chainId, signerAddress } from '$lib/store/chain';
+	import { safe, fallbackHandler } from '$lib/store/safe';
+	import { domainVerifier } from '$lib/store/cow';
 	import { getDomainVerifier, isExtensibleFallbackHandler } from '@cowprotocol/cow-sdk';
 
 	let domainVerifier: string | boolean | undefined;

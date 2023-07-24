@@ -9,10 +9,13 @@ const NUM_BLOCKS = 3;
 const rpc = writable<providers.JsonRpcProvider | undefined>(undefined);
 const blockNumber = writable<number | null>(undefined);
 const chainId = writable<SupportedChainId | null>(undefined);
+const connected = writable<boolean>(false);
+const signerAddress = writable<string | undefined>(undefined);
+
 
 let timerHandle: NodeJS.Timeout | undefined = undefined;
 
-export async function init(_chainId: SupportedChainId): Promise<void> {
+export async function init(_chainId: SupportedChainId, address: string): Promise<void> {
 	// set the provider based on the chainId
 	const provider = new providers.StaticJsonRpcProvider(RPC_URLS[_chainId]!);
 
@@ -21,7 +24,9 @@ export async function init(_chainId: SupportedChainId): Promise<void> {
 		// set the provider
 		chainId.set(_chainId);
 		rpc.set(provider);
+		signerAddress.set(address);
 		blockNumber.set(await provider.getBlockNumber());
+		connected.set(true);
 	});
 }
 
@@ -45,4 +50,4 @@ rpc.subscribe(async (provider) => {
 	}
 });
 
-export { rpc, blockNumber, chainId };
+export { rpc, blockNumber, chainId, connected, signerAddress };
