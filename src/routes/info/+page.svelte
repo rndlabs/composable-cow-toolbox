@@ -4,22 +4,19 @@
 	import { chainId, signerAddress } from '$lib/store/chain';
 	import { safe, fallbackHandler } from '$lib/store/safe';
 	import { domainVerifier } from '$lib/store/cow';
-	import { getDomainVerifier, isExtensibleFallbackHandler } from '@cowprotocol/cow-sdk';
-
-	let domainVerifier: string | boolean | undefined;
+	import { isExtensibleFallbackHandler, isComposableCoW } from '@cowprotocol/cow-sdk';
 
 	let handlerCheck =
 		($fallbackHandler && $chainId && isExtensibleFallbackHandler($fallbackHandler, $chainId)) ||
 		false;
+	
+	let composableCowCheck = false;
 
-	domainSeparator.subscribe(async (value) => {
-		if (value && $signerAddress && $chainId && $rpc) {
-			getDomainVerifier($signerAddress, value, $chainId, $rpc).then((verifier) => {
-				console.log('domain verifier', verifier);
-				domainVerifier = verifier;
-			});
-		}
-	});
+	$: {
+		$domainVerifier.then((verifier) => {
+			composableCowCheck = ($chainId && verifier && isComposableCoW(verifier, $chainId)) || false;
+		});
+	}
 </script>
 
 <WizardPage
@@ -47,7 +44,7 @@
 								{#if handlerCheck}
 									Extensible ✅
 								{:else}
-									Non-extensible ❌
+									<tt>ExtensibleFallbackHandler</tt> not configured ❌
 								{/if}
 							</span>
 						{:else}
@@ -59,11 +56,15 @@
 					<strong><tt>GPv2Settlement</tt> domain verifier:</strong>
 					<span class="address-value-container">
 						{#if domainVerifier !== undefined}
-							{#if domainVerifier}
+							{#if composableCowCheck}
 								<Address address={String(domainVerifier)} showExplorer={true} resolveEns={false} />
-								<span class="extensible">Extensible ✅</span>
+								<span class="extensible"><tt>ComposableCoW</tt> ✅</span>
 							{:else}
-								<span class="non-extensible">Non-extensible ❌</span>
+								{#if handlerCheck}
+									<span class="non-extensible"><tt>ComposableCoW</tt> not authorized ❌</span>
+								{:else}
+									<span class="non-extensible"><tt>ExtensibleFallbackHandler</tt> not configured ❌</span>
+								{/if}
 							{/if}
 						{:else}
 							Loading
