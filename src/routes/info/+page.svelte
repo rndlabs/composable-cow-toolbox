@@ -9,7 +9,7 @@
 	let handlerCheck =
 		($fallbackHandler && $chainId && isExtensibleFallbackHandler($fallbackHandler, $chainId)) ||
 		false;
-	
+
 	let composableCowCheck = false;
 
 	$: {
@@ -59,12 +59,12 @@
 							{#if composableCowCheck}
 								<Address address={String(domainVerifier)} showExplorer={true} resolveEns={false} />
 								<span class="extensible"><tt>ComposableCoW</tt> ✅</span>
+							{:else if handlerCheck}
+								<span class="non-extensible"><tt>ComposableCoW</tt> not authorized ❌</span>
 							{:else}
-								{#if handlerCheck}
-									<span class="non-extensible"><tt>ComposableCoW</tt> not authorized ❌</span>
-								{:else}
-									<span class="non-extensible"><tt>ExtensibleFallbackHandler</tt> not configured ❌</span>
-								{/if}
+								<span class="non-extensible"
+									><tt>ExtensibleFallbackHandler</tt> not configured ❌</span
+								>
 							{/if}
 						{:else}
 							Loading

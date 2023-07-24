@@ -47,10 +47,7 @@
 	<!-- Render the page content using the slot -->
 
 	{#key poke}
-		<main
-			in:fade={{ duration: 0, delay: 400 }}
-			out:fade={{ duration: 0, delay: 400 }}
-		>
+		<main in:fade={{ duration: 0, delay: 400 }} out:fade={{ duration: 0, delay: 400 }}>
 			<slot />
 		</main>
 	{/key}

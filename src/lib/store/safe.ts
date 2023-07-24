@@ -42,6 +42,4 @@ const fallbackHandler: Readable<string | undefined> = derived([safe], ([$safe], 
 	}
 });
 
-
-
 export { safe, safeApp, safeInfo, fallbackHandler };

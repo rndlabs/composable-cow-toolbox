@@ -25,6 +25,6 @@ const domainVerifier = derived(
 		// Retrieve the domain verifier for the GPv2Settlement domain.
 		return getDomainVerifier($signerAddress, $domainSeparator, $chainId, $rpc);
 	}
-)
+);
 
 export { domainSeparator, domainVerifier };

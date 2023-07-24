@@ -12,7 +12,6 @@ const chainId = writable<SupportedChainId | null>(undefined);
 const connected = writable<boolean>(false);
 const signerAddress = writable<string | undefined>(undefined);
 
-
 let timerHandle: NodeJS.Timeout | undefined = undefined;
 
 export async function init(_chainId: SupportedChainId, address: string): Promise<void> {
