@@ -1,12 +1,31 @@
 <script lang="ts">
 	import { hasError } from '$lib/store/error';
+	import { fade } from 'svelte/transition';
+	import { beforeNavigate } from '$app/navigation';
 
 	import ErrorModal from '$lib/components/ErrorModal.svelte';
 	import Connect from '$lib/components/web3/Connect.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
+	import RotatingCow from '$lib/components/RotatingCow.svelte';
 
 	export const ssr = false;
+
+	let isLoading = false;
+	let poke = 0;
+
+	beforeNavigate(({ to }) => {
+		// Set `isLoading` to true when navigating to a new page
+		// Create a timer to set `isLoading` back to false after 1500ms
+		if (to?.route.id) {
+			isLoading = true;
+			poke++;
+
+			setTimeout(() => {
+				isLoading = false;
+			}, 750);
+		}
+	});
 </script>
 
 <Connect>
@@ -20,11 +39,22 @@
 			<a href="/multi-conditional-order" class="nav-item">Multi Conditional Order</a> -->
 		</div>
 	</TopBar>
-	<main>
-		<slot />
-	</main>
-	<Footer />
+	<!-- Show the RotatingCow only during page transition -->
+	{#if isLoading}
+		<RotatingCow rotationDuration={750} rotations={3} />
+	{/if}
 
+	<!-- Render the page content using the slot -->
+
+	{#key poke}
+		<main
+			in:fade={{ duration: 0, delay: 400 }}
+			out:fade={{ duration: 0, delay: 400 }}
+		>
+			<slot />
+		</main>
+	{/key}
+	<Footer />
 	{#if $hasError}
 		<!-- Show the ErrorModal if the modal is open -->
 		<ErrorModal />
