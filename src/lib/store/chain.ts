@@ -7,11 +7,12 @@ const NUM_BLOCKS = 3;
 
 // provider
 const rpc = writable<providers.JsonRpcProvider | undefined>(undefined);
-const blockNumber = writable<number | null>(undefined);
-const chainId = writable<SupportedChainId | null>(undefined);
+const blockNumber = writable<number | undefined>(undefined);
+const chainId = writable<SupportedChainId | undefined>(undefined);
 const connected = writable<boolean>(false);
 const signerAddress = writable<string | undefined>(undefined);
 
+// holds the handler for the block monitoring
 let timerHandle: NodeJS.Timeout | undefined = undefined;
 
 export async function init(_chainId: SupportedChainId, address: string): Promise<void> {
