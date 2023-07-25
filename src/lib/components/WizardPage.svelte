@@ -6,6 +6,13 @@
 	export let title: string;
 	export let leftButton: WizardButtonProps | undefined = undefined;
 	export let rightButton: WizardButtonProps | undefined = undefined;
+	export let txButton: TXButtonProps | undefined = undefined;
+
+	interface TXButtonProps {
+		text: String;
+		disabled: boolean;
+		handler: () => void;
+	}
 
 	interface WizardButtonProps {
 		text: string;
@@ -24,6 +31,17 @@
 	<div class="page-content">
 		<slot name="content" />
 
+		<!-- Render the optional transaction button if provided -->
+		{#if txButton}
+			<div class="btn-transaction-container">
+				<button
+					class="btn-transaction {txButton.disabled ? 'disabled' : ''}"
+					on:click={txButton.handler}
+				>
+					{txButton.text}
+				</button>
+			</div>
+		{/if}
 
 		{#if leftButton || rightButton}
 			<div class="page-buttons">
@@ -133,5 +151,36 @@
 		border: none;
 		border-radius: 4px;
 		cursor: pointer;
+	}
+	.btn-transaction-container {
+		display: flex;
+		justify-content: center;
+		margin-top: 20px; /* Add some spacing above the transaction button */
+
+		/* Align the transaction button to the right */
+		justify-content: flex-end;
+	}
+
+	/* Style for the transaction button */
+	.btn-transaction {
+		background-color: #4caf50; /* Green background color for the transaction button */
+		color: #fff; /* White text color */
+		padding: 10px 20px; /* Larger padding for the transaction button */
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a slight shadow */
+		transition: background-color 0.3s; /* Smooth transition for the background color */
+
+		/* On hover, darken the background color */
+		&:hover {
+			background-color: #45a049; /* Slightly darker green on hover */
+		}
+	}
+	/* Style for the disabled transaction button */
+	.btn-transaction.disabled {
+		background-color: #ccc; /* Gray background color for disabled button */
+		color: #888; /* Gray text color for disabled button */
+		cursor: not-allowed; /* Show not-allowed cursor for disabled button */
 	}
 </style>
