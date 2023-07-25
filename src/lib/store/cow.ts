@@ -1,6 +1,6 @@
-import { derived, writable } from 'svelte/store';
+import { derived, writable, type Readable } from 'svelte/store';
 import { chainId, rpc, signerAddress } from './chain';
-import { OrderSigningUtils, getDomainVerifier } from '@cowprotocol/cow-sdk';
+import { OrderSigningUtils, getDomainVerifier, isComposableCow as isComposableCoWSdk } from '@cowprotocol/cow-sdk';
 
 const domainSeparator = writable<string | undefined>(undefined);
 
@@ -15,16 +15,33 @@ chainId.subscribe(async (chainId) => {
 	domainSeparator.set(undefined);
 });
 
-const domainVerifier = derived(
+const domainVerifier: Readable<string | undefined> = derived(
 	[domainSeparator, rpc, signerAddress, chainId],
-	async ([$domainSeparator, $rpc, $signerAddress, $chainId]) => {
-		if (!$domainSeparator || !$rpc || !$signerAddress || !$chainId) {
-			return undefined;
+	([$domainSeparator, $rpc, $signerAddress, $chainId], set) => {
+		if ($domainSeparator && $rpc && $signerAddress && $chainId) {
+			getDomainVerifier($signerAddress, $domainSeparator, $chainId, $rpc)
+				.then((domainVerifier) => {
+					set(domainVerifier);
+				})
+				.catch((e) => {
+					set(undefined);
+				});
 		}
-
-		// Retrieve the domain verifier for the GPv2Settlement domain.
-		return getDomainVerifier($signerAddress, $domainSeparator, $chainId, $rpc);
+		
+		set(undefined);
 	}
 );
 
-export { domainSeparator, domainVerifier };
+const isComposableCow: Readable<boolean> = derived(
+	[domainVerifier, chainId],
+	([$domainVerifier, $chainId], set) => {
+		if ($domainVerifier && $chainId) {
+			set(isComposableCoWSdk($domainVerifier, $chainId));
+			return;
+		}
+
+		set(false);
+	}
+)
+
+export { domainSeparator, domainVerifier, isComposableCow };

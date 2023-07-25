@@ -6,6 +6,7 @@ import type {
 } from '@rndlabs/safe-apps-sdk';
 import type SafeAppsSDK from '@rndlabs/safe-apps-sdk';
 import { Safe, EthersAdapter } from '@rndlabs/safe-protocol-kit';
+import { isExtensibleFallbackHandler as isExtensibleFallbackHandlerSdk } from '@cowprotocol/cow-sdk';
 import { derived, writable, type Readable, type Unsubscriber } from 'svelte/store';
 import { connected, rpc, chainId } from './chain';
 import { ethers } from 'ethers';
@@ -87,6 +88,15 @@ const fallbackHandler: Readable<string | undefined> = derived([safe], ([$safe], 
 	} else {
 		set(undefined);
 	}
+});
+
+const isExtensibleFallbackHandler = derived([fallbackHandler, chainId], ([$fallbackHandler, $chainId], set) => {
+	if ($fallbackHandler && $chainId) {
+		set(isExtensibleFallbackHandlerSdk($fallbackHandler, $chainId));
+		return;
+	}
+
+	set(false);
 });
 
 const txMonitor = writable<TransactionMonitor | undefined>(undefined);
