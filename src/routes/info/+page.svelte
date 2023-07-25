@@ -24,56 +24,62 @@
 	leftButton={{ text: 'Back', uri: '/' }}
 	rightButton={{ text: 'Next', uri: '/setup' }}
 >
-	<h2>Diagnostic Information</h2>
-	{#if safe && signerAddress && $chainId}
-		<div>
-			<!-- Loop through the fixed information and display each item -->
-			<div class="fixed-info-item">
-				<strong>Safe Address:</strong>
-				<span class="address-value-container">
-					<Address address={$signerAddress} showExplorer={true} />
-				</span>
-			</div>
-			{#if $safe}
+	<section slot="content">
+		<h2>Diagnostic Information</h2>
+		{#if safe && signerAddress && $chainId}
+			<div>
+				<!-- Loop through the fixed information and display each item -->
 				<div class="fixed-info-item">
-					<strong>Fallback Handler:</strong>
+					<strong>Safe Address:</strong>
 					<span class="address-value-container">
-						{#if $fallbackHandler}
-							<Address address={$fallbackHandler} showExplorer={true} resolveEns={false} />
-							<span class={handlerCheck ? 'extensible' : 'non-extensible'}>
-								{#if handlerCheck}
-									Extensible ✅
-								{:else}
-									<tt>ExtensibleFallbackHandler</tt> not configured ❌
-								{/if}
-							</span>
-						{:else}
-							Loading
-						{/if}
+						<Address address={$signerAddress} showExplorer={true} />
 					</span>
 				</div>
-				<div class="fixed-info-item">
-					<strong><tt>GPv2Settlement</tt> domain verifier:</strong>
-					<span class="address-value-container">
-						{#if domainVerifier !== undefined}
-							{#if composableCowCheck}
-								<Address address={String(domainVerifier)} showExplorer={true} resolveEns={false} />
-								<span class="extensible"><tt>ComposableCoW</tt> ✅</span>
-							{:else if handlerCheck}
-								<span class="non-extensible"><tt>ComposableCoW</tt> not authorized ❌</span>
+				{#if $safe}
+					<div class="fixed-info-item">
+						<strong>Fallback Handler:</strong>
+						<span class="address-value-container">
+							{#if $fallbackHandler}
+								<Address address={$fallbackHandler} showExplorer={true} resolveEns={false} />
+								<span class={handlerCheck ? 'extensible' : 'non-extensible'}>
+									{#if handlerCheck}
+										Extensible ✅
+									{:else}
+										<tt>ExtensibleFallbackHandler</tt> not configured ❌
+									{/if}
+								</span>
 							{:else}
-								<span class="non-extensible"
-									><tt>ExtensibleFallbackHandler</tt> not configured ❌</span
-								>
+								Loading
 							{/if}
-						{:else}
-							Loading
-						{/if}
-					</span>
-				</div>
-			{/if}
-		</div>
-	{/if}
+						</span>
+					</div>
+					<div class="fixed-info-item">
+						<strong><tt>GPv2Settlement</tt> domain verifier:</strong>
+						<span class="address-value-container">
+							{#if domainVerifier !== undefined}
+								{#if composableCowCheck}
+									<Address
+										address={String(domainVerifier)}
+										showExplorer={true}
+										resolveEns={false}
+									/>
+									<span class="extensible"><tt>ComposableCoW</tt> ✅</span>
+								{:else if handlerCheck}
+									<span class="non-extensible"><tt>ComposableCoW</tt> not authorized ❌</span>
+								{:else}
+									<span class="non-extensible"
+										><tt>ExtensibleFallbackHandler</tt> not configured ❌</span
+									>
+								{/if}
+							{:else}
+								Loading
+							{/if}
+						</span>
+					</div>
+				{/if}
+			</div>
+		{/if}
+	</section>
 </WizardPage>
 
 <style>

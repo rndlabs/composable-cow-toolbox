@@ -22,7 +22,8 @@
 		<h2>{title}</h2>
 	</div>
 	<div class="page-content">
-		<slot />
+		<slot name="content" />
+
 
 		{#if leftButton || rightButton}
 			<div class="page-buttons">
