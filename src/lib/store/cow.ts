@@ -1,6 +1,6 @@
 import { derived, writable, type Readable } from 'svelte/store';
 import { chainId, rpc, signerAddress } from './chain';
-import { OrderSigningUtils, getDomainVerifier, isComposableCow as isComposableCoWSdk } from '@cowprotocol/cow-sdk';
+import { OrderSigningUtils, getDomainVerifier, isComposableCow as isComposableCowSdk } from '@cowprotocol/cow-sdk';
 
 const domainSeparator = writable<string | undefined>(undefined);
 
@@ -36,7 +36,7 @@ const isComposableCow: Readable<boolean> = derived(
 	[domainVerifier, chainId],
 	([$domainVerifier, $chainId], set) => {
 		if ($domainVerifier && $chainId) {
-			set(isComposableCoWSdk($domainVerifier, $chainId));
+			set(isComposableCowSdk($domainVerifier, $chainId));
 			return;
 		}
 

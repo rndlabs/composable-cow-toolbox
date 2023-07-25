@@ -3,7 +3,7 @@
 	import { chainId, signerAddress } from '$lib/store/chain';
 	import type { TransactionBatch as TransactionBatchType } from '$lib/store/safe';
 	import { fallbackHandler, safe, txMonitor, isExtensibleFallbackHandler } from '$lib/store/safe';
-	import { domainVerifier, isComposableCow } from '$lib/store/cow';
+	import { isComposableCow } from '$lib/store/cow';
 	import WizardPage from '$lib/components/WizardPage.svelte';
 	import CheckboxWithLabel from '$lib/components/CheckboxWithLabel.svelte';
 	import TransactionBatch from '$lib/components/web3/TransactionBatch.svelte';
