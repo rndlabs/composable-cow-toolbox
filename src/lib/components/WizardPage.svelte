@@ -30,6 +30,7 @@
 	</div>
 	<div class="page-content">
 		<slot name="content" />
+		<slot name="footer" />
 
 		<!-- Render the optional transaction button if provided -->
 		{#if txButton}
