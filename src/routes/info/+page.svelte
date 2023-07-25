@@ -2,14 +2,77 @@
 	import WizardPage from '$lib/components/WizardPage.svelte';
 	import Address from '$lib/components/web3/Address.svelte';
 	import { chainId, signerAddress } from '$lib/store/chain';
-	import { safe, fallbackHandler, isExtensibleFallbackHandler } from '$lib/store/safe';
+	import {
+		safe,
+		fallbackHandler,
+		isExtensibleFallbackHandler,
+		type TransactionBatch,
+		txMonitor
+	} from '$lib/store/safe';
 	import { domainVerifier, isComposableCow } from '$lib/store/cow';
+	import { OrderSigningUtils, createSetDomainVerifierTx } from '@cowprotocol/cow-sdk';
+	import { constants } from 'ethers';
+	import { setError } from '$lib/store/error';
+
+	let txButton: any;
+
+	$: {
+		txButton =
+			$isExtensibleFallbackHandler && $isComposableCow
+				? {
+						text: 'Reset',
+						disabled: false,
+						handler: async () => {
+							// Reset the fallback handler and domain verifier.
+							if ($safe) {
+								const tx = await $safe.createEnableFallbackHandlerTx('0xf48f2B2d2a534e402487b3ee7C18c33Aec0Fe5e4');
+								if (tx && $signerAddress && $chainId) {
+									const batch: TransactionBatch = {
+										txs: [
+											{
+												// We must do this step before we reset the fallback handler.
+												// Otherwise we will not be able to do it afterwards.
+												description: 'Reset the domain verifier to Safe default (nothing)',
+												tx: {
+													to: $signerAddress,
+													value: '0',
+													data: createSetDomainVerifierTx(
+														OrderSigningUtils.getDomainSeparator($chainId),
+														constants.AddressZero
+													)
+												},
+												wipeRemaining: true
+											},
+											{
+												description: 'Reset fallback handler to Safe default',
+												tx: {
+													to: $signerAddress,
+													value: '0',
+													data: tx?.data.data
+												},
+												wipeRemaining: false
+											}
+										]
+									};
+
+									try {
+										await $txMonitor?.add(batch);
+									} catch (e) {
+										setError(e);
+									}
+								}
+							}
+						}
+				  }
+				: undefined;
+	}
 </script>
 
 <WizardPage
 	title="🐮🎶 Composable CoW Toolbox 🧰"
 	leftButton={{ text: 'Back', uri: '/' }}
 	rightButton={{ text: 'Next', uri: '/setup' }}
+	{txButton}
 >
 	<section slot="content">
 		<h2>Diagnostic Information</h2>
