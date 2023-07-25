@@ -1,36 +1,20 @@
 <script lang="ts">
+	import type { TransactionBatch } from '$lib/store/safe';
 	import Address from './Address.svelte';
 
-	// create a delete function to respond to a click event
-	function deleteRow(to: string) {
+	export let batch: TransactionBatch;
+
+	// TransactionBatches are strictly indexed by their order in the array.
+	// Therefore the index of the transaction in the array is the same as the index of the transaction in the batch.
+	function deleteTransaction(index: number) {
 		return () => {
-			// filter out the row that matches the "to" address
-			rows = rows.filter((row) => row[0] !== to);
+			const tx = batch.txs[index];
+
+			// If tx.wipeRemaining is true, delete all transactions including this one to the end of the batch.
+			// Otherwise just delete this one.
+			tx.wipeRemaining ? batch.txs.splice(index) : batch.txs.splice(index, 1);
 		};
 	}
-
-	let rows = [
-		[
-			'0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-			'0 ETH',
-			'0x5B38Da6a701c568545dCfcB03FcB875f56beddC45B38Da6a701c568545dCfcB03FcB875f56beddC4'
-		],
-		[
-			'0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2',
-			'0 ETH',
-			'0x5B38Da6a701c568545dCfcB03FcB875f56beddC45B38Da6a701c568545dCfcB03FcB875f56beddC4'
-		],
-		[
-			'0xCA35b7d915458EF540aDe6068dFe2F44E8fa733c',
-			'0.05 ETH',
-			'0x8d3d7c18e93A8e6F83E5F9fBfb0b34A16772B8e2'
-		],
-		[
-			'0x5B38Da6a701c568545dCfcB03FcB875f56beddC4',
-			'0.1 ETH',
-			'0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2'
-		]
-	];
 </script>
 
 <div class="content">
@@ -42,21 +26,23 @@
 					<th>To</th>
 					<th>Value</th>
 					<th>Data</th>
+					<th>Description</th>
 					<th>Delete</th>
 				</tr>
 			</thead>
 			<tbody class="rows-container">
-				{#each rows as row}
+				{#each batch.txs as tx, i}
 					<tr class="transaction-item">
 						<!-- "To" column -->
-						<td class="transaction-item address"><Address address={row[0]} /></td>
+						<td class="transaction-item address"><Address address={tx.tx.to} /></td>
 						<!-- "Value" column -->
-						<td>{row[1]}</td>
+						<td>{tx.tx.value}</td>
 						<!-- "Data" column -->
-						<td class="transaction-item address">{row[2]}</td>
+						<td class="transaction-item address">{tx.tx.data}</td>
 						<!-- "Delete" column -->
+						<td class="transaction-item address">{tx.description}</td>
 						<td>
-							<button class="delete-button" on:click={deleteRow(row[0])}> Delete </button>
+							<button class="delete-button" on:click={deleteTransaction(i)}>Delete</button>
 						</td>
 					</tr>
 				{/each}
