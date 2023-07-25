@@ -2,21 +2,8 @@
 	import WizardPage from '$lib/components/WizardPage.svelte';
 	import Address from '$lib/components/web3/Address.svelte';
 	import { chainId, signerAddress } from '$lib/store/chain';
-	import { safe, fallbackHandler } from '$lib/store/safe';
-	import { domainVerifier } from '$lib/store/cow';
-	import { isExtensibleFallbackHandler, isComposableCoW } from '@cowprotocol/cow-sdk';
-
-	let handlerCheck =
-		($fallbackHandler && $chainId && isExtensibleFallbackHandler($fallbackHandler, $chainId)) ||
-		false;
-
-	let composableCowCheck = false;
-
-	$: {
-		$domainVerifier.then((verifier) => {
-			composableCowCheck = ($chainId && verifier && isComposableCoW(verifier, $chainId)) || false;
-		});
-	}
+	import { safe, fallbackHandler, isExtensibleFallbackHandler } from '$lib/store/safe';
+	import { domainVerifier, isComposableCow } from '$lib/store/cow';
 </script>
 
 <WizardPage
@@ -41,8 +28,8 @@
 						<span class="address-value-container">
 							{#if $fallbackHandler}
 								<Address address={$fallbackHandler} showExplorer={true} resolveEns={false} />
-								<span class={handlerCheck ? 'extensible' : 'non-extensible'}>
-									{#if handlerCheck}
+								<span class={$isExtensibleFallbackHandler ? 'extensible' : 'non-extensible'}>
+									{#if $isExtensibleFallbackHandler}
 										Extensible ✅
 									{:else}
 										<tt>ExtensibleFallbackHandler</tt> not configured ❌
@@ -56,15 +43,15 @@
 					<div class="fixed-info-item">
 						<strong><tt>GPv2Settlement</tt> domain verifier:</strong>
 						<span class="address-value-container">
-							{#if domainVerifier !== undefined}
-								{#if composableCowCheck}
+							{#if $domainVerifier !== undefined}
+								{#if $isComposableCow}
 									<Address
 										address={String(domainVerifier)}
 										showExplorer={true}
 										resolveEns={false}
 									/>
 									<span class="extensible"><tt>ComposableCoW</tt> ✅</span>
-								{:else if handlerCheck}
+								{:else if $isExtensibleFallbackHandler}
 									<span class="non-extensible"><tt>ComposableCoW</tt> not authorized ❌</span>
 								{:else}
 									<span class="non-extensible"
