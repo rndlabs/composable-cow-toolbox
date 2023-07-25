@@ -27,7 +27,7 @@ export type TransactionRecord = {
 // This will be indexed by the safeTxHash
 export type TransactionBatch = {
 	// the transactions to send in a list (ordering is important!)
-	readonly txs: TransactionRecord[];
+	txs: TransactionRecord[];
 };
 
 export type TypedSignatureRecord = {
@@ -267,7 +267,7 @@ export class TransactionMonitor extends Monitor<TransactionBatch> {
 			// get the pending and confirmed from local storage
 			const local = localStorage.getItem(TransactionMonitor._localStoreKey);
 			if (local) {
-				const { records } = JSON.parse(local);
+				const records = JSON.parse(local);
 				this.singleton = new TransactionMonitor(records as MonitorRecords<TransactionBatch>);
 			}
 
@@ -291,6 +291,11 @@ export class TransactionMonitor extends Monitor<TransactionBatch> {
 		// no need to check if safeApp is defined as it's guarded by monitor.add.
 		const { safeTxHash } = await Monitor.safeApp!.txs.send({ txs: item.txs.map((tx) => tx.tx) });
 		// if successful, then add it to the pending list
+		// but first check if this.records.pending[Monitor.chainId!] is defined
+		if (!this.records.pending[Monitor.chainId!]) {
+			this.records.pending[Monitor.chainId!] = {};
+		}
+
 		this.records.pending[Monitor.chainId!][safeTxHash] = item;
 
 		// if the `tx-added` event is defined, then dispatch it
@@ -311,6 +316,11 @@ export class TransactionMonitor extends Monitor<TransactionBatch> {
 
 		// if the transaction is successful, then move it to the confirmed list
 		if (txDetails.txStatus === 'SUCCESS') {
+			// first check if this.records.confirmed[Monitor.chainId!] is defined
+			if (!this.records.confirmed[Monitor.chainId!]) {
+				this.records.confirmed[Monitor.chainId!] = {};
+			}
+
 			this.records.confirmed[Monitor.chainId!][safeTxHash] = batch;
 			delete this.records.pending[Monitor.chainId!][safeTxHash];
 			// TODO: add extra support for pending execution (ie. all signatures
@@ -368,6 +378,10 @@ export class SignatureMonitor extends Monitor<TypedSignatureRecord> {
 			item.msg
 		)) as OffChainSignMessageResponse;
 		// If successful, then add it to the pending list
+		// first check if this.records.pending[Monitor.chainId!] is defined
+		if (!this.records.pending[Monitor.chainId!]) {
+			this.records.pending[Monitor.chainId!] = {};
+		}
 		this.records.pending[Monitor.chainId!][messageHash] = item;
 		if (Monitor.events['sig-added']) {
 			Monitor.events['sig-added'].forEach((callback) => {
@@ -384,6 +398,10 @@ export class SignatureMonitor extends Monitor<TypedSignatureRecord> {
 		if (offChainSignature.length > 0) {
 			// if the signature is successful, then move it to the confirmed list
 			msg.offChainSignature = offChainSignature;
+			// first check if this.records.confirmed[Monitor.chainId!] is defined
+			if (!this.records.confirmed[Monitor.chainId!]) {
+				this.records.confirmed[Monitor.chainId!] = {};
+			}
 			this.records.confirmed[Monitor.chainId!][messageHash] = msg;
 			delete this.records.pending[Monitor.chainId!][messageHash];
 			if (Monitor.events['sig-confirmed']) {
@@ -408,4 +426,4 @@ connected.subscribe(async (connected) => {
 	}
 });
 
-export { safe, safeApp, safeInfo, fallbackHandler, txMonitor, sigMonitor };
+export { safe, safeApp, safeInfo, fallbackHandler, txMonitor, sigMonitor, isExtensibleFallbackHandler };
