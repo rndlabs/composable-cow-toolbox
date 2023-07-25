@@ -106,13 +106,9 @@
 					<div class="fixed-info-item">
 						<strong><tt>GPv2Settlement</tt> domain verifier:</strong>
 						<span class="address-value-container">
-							{#if $domainVerifier !== undefined}
+							{#if $domainVerifier}
 								{#if $isComposableCow}
-									<Address
-										address={String(domainVerifier)}
-										showExplorer={true}
-										resolveEns={false}
-									/>
+									<Address address={$domainVerifier} showExplorer={true} resolveEns={false} />
 									<span class="extensible"><tt>ComposableCoW</tt> ✅</span>
 								{:else if $isExtensibleFallbackHandler}
 									<span class="non-extensible"><tt>ComposableCoW</tt> not authorized ❌</span>
