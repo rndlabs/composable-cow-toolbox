@@ -353,7 +353,7 @@ export class SignatureMonitor extends Monitor<TypedSignatureRecord> {
 			// get the pending and confirmed from local storage
 			const local = localStorage.getItem(SignatureMonitor._localStoreKey);
 			if (local) {
-				const { records } = JSON.parse(local);
+				const records = JSON.parse(local);
 				this.singleton = new SignatureMonitor(records as MonitorRecords<TypedSignatureRecord>);
 			}
 
@@ -362,7 +362,7 @@ export class SignatureMonitor extends Monitor<TypedSignatureRecord> {
 				this.singleton = new SignatureMonitor({ pending: {}, confirmed: {} });
 			}
 
-			TransactionMonitor.addEvents(events);
+			SignatureMonitor.addEvents(events);
 		}
 
 		if (!SignatureMonitor.singleton) {
@@ -395,7 +395,7 @@ export class SignatureMonitor extends Monitor<TypedSignatureRecord> {
 		// get the signature details
 		const offChainSignature = await Monitor.safeApp!.safe.getOffChainSignature(messageHash);
 
-		if (offChainSignature.length > 0) {
+		if (offChainSignature != null && offChainSignature.length > 0) {
 			// if the signature is successful, then move it to the confirmed list
 			msg.offChainSignature = offChainSignature;
 			// first check if this.records.confirmed[Monitor.chainId!] is defined
