@@ -32,7 +32,7 @@
 	"dependencies": {
 		"@metamask/jazzicon": "^2.0.0",
 		"@rndlabs/safe-apps-provider": "^0.1.15",
-		"@rndlabs/safe-apps-sdk": "^0.1.13",
+		"@rndlabs/safe-apps-sdk": "^7.11.1",
 		"@rndlabs/safe-core-sdk-types": "^0.1.4",
 		"@rndlabs/safe-protocol-kit": "^1.0.4",
 		"@types/node": "^20.4.2",

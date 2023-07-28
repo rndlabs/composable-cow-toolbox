@@ -12,8 +12,8 @@ dependencies:
     specifier: ^0.1.15
     version: 0.1.15
   '@rndlabs/safe-apps-sdk':
-    specifier: ^0.1.13
-    version: 0.1.13
+    specifier: ^7.11.1
+    version: 7.11.1
   '@rndlabs/safe-core-sdk-types':
     specifier: ^0.1.4
     version: 0.1.4
@@ -759,6 +759,19 @@ packages:
 
   /@rndlabs/safe-apps-sdk@0.1.13:
     resolution: {integrity: sha512-RAS0nMZTZ+yJs2rr14knimkwzfAmJ9fF+KLxI0A+mrW7E0HZ4H4rz2W47/AE5n0w9LmKoenbPKqmbgZJFYaOdQ==}
+    dependencies:
+      '@rndlabs/safe-gateway-typescript-sdk': 0.1.5
+      typescript: 5.1.6
+      viem: 1.4.1(typescript@5.1.6)
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - utf-8-validate
+      - zod
+    dev: false
+
+  /@rndlabs/safe-apps-sdk@7.11.1:
+    resolution: {integrity: sha512-o7tmLdJyPCXRkonCsi4ctsnNVIE9DpK46pzlAUJLud9oMUyX8o9z4a05TSpJ7aDQ8ZJh7jS6f9/Mk5sqTrko0w==}
     dependencies:
       '@rndlabs/safe-gateway-typescript-sdk': 0.1.5
       typescript: 5.1.6
