@@ -102,12 +102,15 @@ const isExtensibleFallbackHandler = derived([fallbackHandler, chainId], ([$fallb
 const txMonitor = writable<TransactionMonitor | undefined>(undefined);
 const sigMonitor = writable<SignatureMonitor | undefined>(undefined);
 
+type MonitorCallback = (hash: string) => void;
+
 // As monitoring functionality is the same essentially for both tx and sigs, abstract it out
 abstract class Monitor<T> {
 	// static variables
 	protected static safeApp: SafeAppsSDK | undefined = undefined;
 	protected static chainId: number | undefined = undefined;
 	protected static events: MonitorEventRecords = {};
+	protected static callbacks: { [key: string]: MonitorCallback } = {}
 	private static paused = false;
 	private static safeAppHandler: Unsubscriber | undefined = undefined;
 	private static chainIdHandler: Unsubscriber | undefined = undefined;
@@ -141,6 +144,10 @@ abstract class Monitor<T> {
 		}
 	}
 
+	get record(): MonitorRecords<T> {
+		return this.records;
+	}
+
 	async poll(): Promise<void> {
 		// if paused, then do nothing
 		if (Monitor.paused) {
@@ -155,7 +162,13 @@ abstract class Monitor<T> {
 		if (document.visibilityState === 'visible' && this.records.pending[Monitor.chainId]) {
 			// iterate through all pending items
 			for (const [k, o] of Object.entries(this.records.pending[Monitor.chainId])) {
-				return this._poll(k, o);
+				const result = await this._poll(k, o);
+				if (result === true) {
+					// if the result is true, check if there is a callback
+					if (Monitor.callbacks[k]) {
+						Monitor.callbacks[k](k);
+					}
+				}
 			}
 		}
 
@@ -166,9 +179,9 @@ abstract class Monitor<T> {
 		}
 	}
 
-	protected abstract _poll(k: string, o: T): Promise<void>;
+	protected abstract _poll(k: string, o: T): Promise<void | boolean>;
 
-	async add(item: T): Promise<void> {
+	async add(item: T, callback?: MonitorCallback): Promise<void> {
 		// if paused, then throw an error
 		if (Monitor.paused) {
 			throw new Error('Cannot add an item to the monitor when paused!');
@@ -179,7 +192,10 @@ abstract class Monitor<T> {
 		}
 
 		// add the item to the pending list
-		await this._add(item);
+		const result = await this._add(item);
+		if (callback) {
+			Monitor.callbacks[result] = callback;
+		}
 
 		if (!this.tainted) {
 			throw new Error('Added an item but did not taint the monitor!');
@@ -189,7 +205,7 @@ abstract class Monitor<T> {
 		await this.save();
 	}
 
-	protected abstract _add(item: T): Promise<void>;
+	protected abstract _add(item: T): Promise<string>;
 
 	// start the monitor
 	start(numSecs: number): Monitor<T> {
@@ -286,7 +302,7 @@ export class TransactionMonitor extends Monitor<TransactionBatch> {
 		return TransactionMonitor.singleton;
 	}
 
-	async _add(item: TransactionBatch): Promise<void> {
+	async _add(item: TransactionBatch): Promise<string> {
 		// First try submitting the transaction to the safe
 		// no need to check if safeApp is defined as it's guarded by monitor.add.
 		const { safeTxHash } = await Monitor.safeApp!.txs.send({ txs: item.txs.map((tx) => tx.tx) });
@@ -307,9 +323,10 @@ export class TransactionMonitor extends Monitor<TransactionBatch> {
 
 		// dispatch('tx-added', { chainId: Monitor.chainId!, safeTxHash });
 		this.tainted = true;
+		return safeTxHash;
 	}
 
-	protected async _poll(safeTxHash: string, batch: TransactionBatch): Promise<void> {
+	protected async _poll(safeTxHash: string, batch: TransactionBatch): Promise<void | boolean> {
 		// get the transaction details
 		// no need to check if safeApp is defined as it's guarded by monitor.poll.
 		const txDetails = await Monitor.safeApp!.txs.getBySafeTxHash(safeTxHash);
@@ -332,6 +349,7 @@ export class TransactionMonitor extends Monitor<TransactionBatch> {
 				});
 			}
 			this.tainted = true;
+			return true;
 		}
 	}
 }
@@ -372,7 +390,7 @@ export class SignatureMonitor extends Monitor<TypedSignatureRecord> {
 		return SignatureMonitor.singleton;
 	}
 
-	async _add(item: TypedSignatureRecord): Promise<void> {
+	async _add(item: TypedSignatureRecord): Promise<string> {
 		// First try submitting the signature for signing
 		const { messageHash } = (await Monitor.safeApp!.txs.signTypedMessage(
 			item.msg
@@ -389,9 +407,10 @@ export class SignatureMonitor extends Monitor<TypedSignatureRecord> {
 			});
 		}
 		this.tainted = true;
+		return messageHash;
 	}
 
-	protected async _poll(messageHash: string, msg: TypedSignatureRecord): Promise<void> {
+	protected async _poll(messageHash: string, msg: TypedSignatureRecord): Promise<void | boolean> {
 		// get the signature details
 		const offChainSignature = await Monitor.safeApp!.safe.getOffChainSignature(messageHash);
 
@@ -410,6 +429,7 @@ export class SignatureMonitor extends Monitor<TypedSignatureRecord> {
 				});
 			}
 			this.tainted = true;
+			return true;
 		}
 	}
 }
