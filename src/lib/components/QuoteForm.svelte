@@ -21,7 +21,7 @@
 	let kind = 'sell';
 
 	const kinds = [
-		'sell',
+		'sell'
 		// TODO: 'buy'
 		// Add more kinds as needed
 	];
@@ -72,13 +72,18 @@
 			buyToken: buyToken.address,
 			from,
 			receiver,
-			sellAmountBeforeFee: sellAmountBeforeFee.length > 0 ? BigNumber.from(sellAmountBeforeFee).mul(BigNumber.from(10).pow(sellToken.decimals)).toString() : '',
+			sellAmountBeforeFee:
+				sellAmountBeforeFee.length > 0
+					? BigNumber.from(sellAmountBeforeFee)
+							.mul(BigNumber.from(10).pow(sellToken.decimals))
+							.toString()
+					: '',
 			kind: kind as OrderQuoteRequest['kind']
 		};
 		onSubmit(quoteRequest);
 	}
 
-	onMount(async () => {		
+	onMount(async () => {
 		// make sure the tokens are initialized
 		init();
 	});

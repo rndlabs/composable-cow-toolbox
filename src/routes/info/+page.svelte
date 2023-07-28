@@ -25,7 +25,9 @@
 						handler: async () => {
 							// Reset the fallback handler and domain verifier.
 							if ($safe) {
-								const tx = await $safe.createEnableFallbackHandlerTx('0xf48f2B2d2a534e402487b3ee7C18c33Aec0Fe5e4');
+								const tx = await $safe.createEnableFallbackHandlerTx(
+									'0xf48f2B2d2a534e402487b3ee7C18c33Aec0Fe5e4'
+								);
 								if (tx && $signerAddress && $chainId) {
 									const batch: TransactionBatch = {
 										txs: [

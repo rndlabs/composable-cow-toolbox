@@ -16,7 +16,7 @@
 	import WizardPage from '$lib/components/WizardPage.svelte';
 	import QuoteView from '$lib/components/QuoteView.svelte';
 	import QuoteForm from '$lib/components/QuoteForm.svelte';
-	
+
 	let orderBookApi: OrderBookApi;
 	$: {
 		orderBookApi = new OrderBookApi({ chainId: $chainId! });
@@ -30,7 +30,7 @@
 		try {
 			console.log('Quote Request: ', quoteRequest);
 			quote = await orderBookApi.getQuote({
-				...quoteRequest,
+				...quoteRequest
 			});
 			quote = {
 				...quote,
@@ -41,9 +41,9 @@
 						.mul(1005)
 						.div(1000)
 						.toString(),
-					feeAmount: '0',
+					feeAmount: '0'
 				}
-			}
+			};
 			console.log('Quote: ', quote);
 		} catch (error: any) {
 			setError(error.body.description || 'An error occurred.');
@@ -63,26 +63,25 @@
 					domain: {
 						...gpv2SettlementDomain,
 						chainId: String(gpv2SettlementDomain.chainId),
-						salt: undefined,
+						salt: undefined
 					},
 					types: OrderSigningUtils.getEIP712Types(),
-					message: quote.quote,
-				},
-
+					message: quote.quote
+				}
 			},
 			// callback for submitting the order to the orderbook
 			async (hash: string) => {
 				// get the message from the sig monitor
-				const {msg, offChainSignature} = $sigMonitor!.record['confirmed'][$chainId!][hash];
+				const { msg, offChainSignature } = $sigMonitor!.record['confirmed'][$chainId!][hash];
 
-				const orderBookApi = new OrderBookApi({chainId: $chainId!})
+				const orderBookApi = new OrderBookApi({ chainId: $chainId! });
 				orderUid = await orderBookApi.sendOrder({
-					...msg.message as OrderParameters,
+					...(msg.message as OrderParameters),
 					from: $signerAddress!,
 					signingScheme: SigningScheme.EIP1271,
 					signature: offChainSignature!
 				});
-			},
+			}
 		);
 	}
 </script>
@@ -97,14 +96,15 @@
 		{#if quote}
 			<QuoteView {quote} />
 			<div class="btn-container">
-				<button
-				class="btn-sign"
-				on:click={handleSubmitSwap}>Swap!</button
-			>
+				<button class="btn-sign" on:click={handleSubmitSwap}>Swap!</button>
 			</div>
 		{/if}
 		{#if orderUid}
-			<div>Order successfully submitted: <a href="{explorerUrlOrder(orderUid, $chainId)}">{orderUid.slice(2,10)}</a></div>
+			<div>
+				Order successfully submitted: <a href={explorerUrlOrder(orderUid, $chainId)}
+					>{orderUid.slice(2, 10)}</a
+				>
+			</div>
 		{/if}
 	</div>
 </WizardPage>

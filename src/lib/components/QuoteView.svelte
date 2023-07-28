@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { OrderQuoteResponse } from '@cowprotocol/cow-sdk';
+	import type { OrderQuoteResponse } from '@cowprotocol/cow-sdk';
 	import type { TokenInfo } from '@uniswap/token-lists';
 	import { utils } from 'ethers';
-    import { tokensOnThisChain } from '$lib/store/tokens';
+	import { tokensOnThisChain } from '$lib/store/tokens';
 
 	export let quote: OrderQuoteResponse;
 
@@ -10,14 +10,17 @@
 	let buyToken: TokenInfo | string = quote.quote.buyToken;
 
 	$: {
-		sellToken = $tokensOnThisChain.find((token) => token.address === quote.quote.sellToken) || quote.quote.sellToken;
-    	buyToken = $tokensOnThisChain.find((token) => token.address === quote.quote.buyToken) || quote.quote.buyToken;
+		sellToken =
+			$tokensOnThisChain.find((token) => token.address === quote.quote.sellToken) ||
+			quote.quote.sellToken;
+		buyToken =
+			$tokensOnThisChain.find((token) => token.address === quote.quote.buyToken) ||
+			quote.quote.buyToken;
 	}
 
 	function withDecimalsFallback(value: string, token: TokenInfo | string): string {
 		return typeof token === 'string' ? value : utils.formatUnits(value, token.decimals);
 	}
-
 </script>
 
 <div class="content">
@@ -25,11 +28,15 @@
 	<div class="details-table">
 		<div class="details-row">
 			<div class="details-cell">Sell Token:</div>
-			<div class="details-cell">{typeof sellToken == 'string' ? sellToken : `${sellToken.name} ( ${sellToken.symbol})` }</div>
+			<div class="details-cell">
+				{typeof sellToken == 'string' ? sellToken : `${sellToken.name} ( ${sellToken.symbol})`}
+			</div>
 		</div>
 		<div class="details-row">
 			<div class="details-cell">Buy Token:</div>
-			<div class="details-cell">{typeof buyToken == 'string' ? buyToken : `${buyToken.name} ( ${buyToken.symbol})` }</div>
+			<div class="details-cell">
+				{typeof buyToken == 'string' ? buyToken : `${buyToken.name} ( ${buyToken.symbol})`}
+			</div>
 		</div>
 		<div class="details-row">
 			<div class="details-cell">Fee Amount:</div>

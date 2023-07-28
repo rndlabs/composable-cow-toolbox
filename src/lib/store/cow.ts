@@ -1,6 +1,10 @@
 import { derived, writable, type Readable } from 'svelte/store';
 import { chainId, rpc, signerAddress } from './chain';
-import { OrderSigningUtils, getDomainVerifier, isComposableCow as isComposableCowSdk } from '@cowprotocol/cow-sdk';
+import {
+	OrderSigningUtils,
+	getDomainVerifier,
+	isComposableCow as isComposableCowSdk
+} from '@cowprotocol/cow-sdk';
 
 const domainSeparator = writable<string | undefined>(undefined);
 
@@ -27,7 +31,7 @@ const domainVerifier: Readable<string | undefined> = derived(
 					set(undefined);
 				});
 		}
-		
+
 		set(undefined);
 	}
 );
@@ -42,6 +46,6 @@ const isComposableCow: Readable<boolean> = derived(
 
 		set(false);
 	}
-)
+);
 
 export { domainSeparator, domainVerifier, isComposableCow };

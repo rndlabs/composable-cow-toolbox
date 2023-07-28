@@ -1,6 +1,6 @@
 <!-- TokenField.svelte -->
 <script lang="ts">
-	import type { TokenInfo } from "@uniswap/token-lists";
+	import type { TokenInfo } from '@uniswap/token-lists';
 
 	export let tokens: TokenInfo[];
 	export let label: string;

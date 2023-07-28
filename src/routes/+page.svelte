@@ -12,12 +12,12 @@
 					Upgrading an existing <tt>Safe</tt> to <tt>ExtensibleFallbackHandler + ComposableCoW</tt>
 				</li>
 				<li>
-					Placing off-chain ERC-1271 order intents using normal signing (with <tt>Safe</tt> off-chain signature
-					aggregation)
+					Placing off-chain ERC-1271 order intents using normal signing (with <tt>Safe</tt> off-chain
+					signature aggregation)
 				</li>
 				<li>Create a single conditional order (<tt>TWAP</tt> anyone?)</li>
 				<li>Create multiple conditional orders using Merkle Roots 🌳</li>
-			</ol>	
+			</ol>
 		</div>
 		<div>Let's get started!🚀</div>
 	</section>

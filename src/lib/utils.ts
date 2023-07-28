@@ -1,4 +1,4 @@
-import { SupportedChainId } from "@cowprotocol/cow-sdk";
+import { SupportedChainId } from '@cowprotocol/cow-sdk';
 
 // returns a shortened address string with ellipses in the middle
 export const formatAddress = (address: string, chars = 4) => {
@@ -18,4 +18,4 @@ export const explorerUrlOrder = (tx: string, chainId?: SupportedChainId) => {
 		default:
 			return `https://explorer.cow.fi/orders/${tx}`;
 	}
-}
+};

@@ -1,23 +1,30 @@
 <script lang="ts">
-	import { COMPOSABLE_COW_CONTRACT_ADDRESS, EXTENSIBLE_FALLBACK_HANDLER_CONTRACT_ADDRESS, OrderSigningUtils, createSetDomainVerifierTx } from '@cowprotocol/cow-sdk';
+	import {
+		COMPOSABLE_COW_CONTRACT_ADDRESS,
+		EXTENSIBLE_FALLBACK_HANDLER_CONTRACT_ADDRESS,
+		OrderSigningUtils,
+		createSetDomainVerifierTx
+	} from '@cowprotocol/cow-sdk';
 	import { chainId, signerAddress } from '$lib/store/chain';
 	import type { TransactionBatch as TransactionBatchType } from '$lib/store/safe';
-	import { fallbackHandler, safe, txMonitor, isExtensibleFallbackHandler } from '$lib/store/safe';
+	import { safe, txMonitor, isExtensibleFallbackHandler } from '$lib/store/safe';
 	import { isComposableCow } from '$lib/store/cow';
 	import WizardPage from '$lib/components/WizardPage.svelte';
 	import CheckboxWithLabel from '$lib/components/CheckboxWithLabel.svelte';
 	import TransactionBatch from '$lib/components/web3/TransactionBatch.svelte';
 	import { setError } from '$lib/store/error';
 
-	let batch: TransactionBatchType = { txs: [] }
+	let batch: TransactionBatchType = { txs: [] };
 
 	// 1. If the fallback handler is not the ExtensibleFallbackHandler, add a transaction to upgrade it.
 	let upgradeFallbackHandler = false;
 	const upgradeFallbackHandlerCallback = async (checked: boolean) => {
 		if (checked && $signerAddress) {
-			const tx = await $safe?.createEnableFallbackHandlerTx(EXTENSIBLE_FALLBACK_HANDLER_CONTRACT_ADDRESS[$chainId!])
+			const tx = await $safe?.createEnableFallbackHandlerTx(
+				EXTENSIBLE_FALLBACK_HANDLER_CONTRACT_ADDRESS[$chainId!]
+			);
 			if (!tx) {
-				console.error('Failed to create transaction to upgrade fallback handler')
+				console.error('Failed to create transaction to upgrade fallback handler');
 			}
 
 			// Add a transaction to upgrade the fallback handler.
@@ -45,7 +52,10 @@
 				tx: {
 					to: $signerAddress,
 					value: '0',
-					data: createSetDomainVerifierTx(OrderSigningUtils.getDomainSeparator($chainId), COMPOSABLE_COW_CONTRACT_ADDRESS[$chainId]),
+					data: createSetDomainVerifierTx(
+						OrderSigningUtils.getDomainSeparator($chainId),
+						COMPOSABLE_COW_CONTRACT_ADDRESS[$chainId]
+					)
 				},
 				wipeRemaining: false
 			};
@@ -88,18 +98,21 @@
 <WizardPage
 	title="🐮🎶 Composable CoW Toolbox 🧰"
 	leftButton={{ text: 'Back', uri: '/info' }}
-	rightButton={{ text: 'Next', uri: '/setup' }}
+	rightButton={{ text: 'Simple Swap 🔁', uri: '/simple-swap' }}
 	{txButton}
 >
 	<section slot="content">
 		<h2>Setup your <tt>Safe</tt> for <tt>ComposableCoW</tt></h2>
 		<div>
-			In order to use the <tt>ComposableCoW</tt> Toolbox, you need to setup your <tt>Safe</tt> to use
-			the <tt>ExtensibleFallbackHandler</tt> and the <tt>GPv2Settlement</tt> domain verifier.
+			In order to use the <tt>ComposableCoW</tt> Toolbox, you need to setup your <tt>Safe</tt> to
+			use the <tt>ExtensibleFallbackHandler</tt> and the <tt>GPv2Settlement</tt> domain verifier.
 		</div>
-	
+
 		{#if !$isExtensibleFallbackHandler}
-			<CheckboxWithLabel bind:checked={upgradeFallbackHandler} handler={upgradeFallbackHandlerCallback}>
+			<CheckboxWithLabel
+				bind:checked={upgradeFallbackHandler}
+				handler={upgradeFallbackHandlerCallback}
+			>
 				<strong slot="whenChecked" class="whenChecked"
 					>Upgrade fallback handler to <tt>ExtensibleFallbackHandler</tt></strong
 				>
@@ -109,9 +122,12 @@
 				>
 			</CheckboxWithLabel>
 		{/if}
-	
+
 		{#if !$isComposableCow && ($isExtensibleFallbackHandler || (upgradeFallbackHandler && batch.txs.length > 0))}
-			<CheckboxWithLabel bind:checked={authoriseComposableCow} handler={authoriseComposableCowCallback}>
+			<CheckboxWithLabel
+				bind:checked={authoriseComposableCow}
+				handler={authoriseComposableCowCallback}
+			>
 				<strong slot="whenChecked" class="whenChecked"
 					>Authorise <tt>ComposableCoW</tt> to sign orders for the <tt>GPv2Settlement</tt> domain.</strong
 				>

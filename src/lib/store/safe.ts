@@ -90,14 +90,17 @@ const fallbackHandler: Readable<string | undefined> = derived([safe], ([$safe], 
 	}
 });
 
-const isExtensibleFallbackHandler = derived([fallbackHandler, chainId], ([$fallbackHandler, $chainId], set) => {
-	if ($fallbackHandler && $chainId) {
-		set(isExtensibleFallbackHandlerSdk($fallbackHandler, $chainId));
-		return;
-	}
+const isExtensibleFallbackHandler = derived(
+	[fallbackHandler, chainId],
+	([$fallbackHandler, $chainId], set) => {
+		if ($fallbackHandler && $chainId) {
+			set(isExtensibleFallbackHandlerSdk($fallbackHandler, $chainId));
+			return;
+		}
 
-	set(false);
-});
+		set(false);
+	}
+);
 
 const txMonitor = writable<TransactionMonitor | undefined>(undefined);
 const sigMonitor = writable<SignatureMonitor | undefined>(undefined);
@@ -110,7 +113,7 @@ abstract class Monitor<T> {
 	protected static safeApp: SafeAppsSDK | undefined = undefined;
 	protected static chainId: number | undefined = undefined;
 	protected static events: MonitorEventRecords = {};
-	protected static callbacks: { [key: string]: MonitorCallback } = {}
+	protected static callbacks: { [key: string]: MonitorCallback } = {};
 	private static paused = false;
 	private static safeAppHandler: Unsubscriber | undefined = undefined;
 	private static chainIdHandler: Unsubscriber | undefined = undefined;
@@ -446,4 +449,12 @@ connected.subscribe(async (connected) => {
 	}
 });
 
-export { safe, safeApp, safeInfo, fallbackHandler, txMonitor, sigMonitor, isExtensibleFallbackHandler };
+export {
+	safe,
+	safeApp,
+	safeInfo,
+	fallbackHandler,
+	txMonitor,
+	sigMonitor,
+	isExtensibleFallbackHandler
+};
