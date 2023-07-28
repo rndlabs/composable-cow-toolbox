@@ -1,19 +1,17 @@
 <!-- TokenField.svelte -->
 <script lang="ts">
-	interface Token {
-		value: string;
-		label: string;
-	}
+	import type { TokenInfo } from "@uniswap/token-lists";
 
-	export let tokens: Token[];
-	export let selectedToken: string = '';
+	export let tokens: TokenInfo[];
+	export let label: string;
+	export let selectedToken: TokenInfo;
 </script>
 
 <label>
-	Token:
+	{label}
 	<select bind:value={selectedToken} required>
 		{#each tokens as token}
-			<option value={token.value}>{token.label}</option>
+			<option value={token}>{token.name} ({token.symbol})</option>
 		{/each}
 	</select>
 </label>

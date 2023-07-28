@@ -1,40 +1,28 @@
 <!-- QuoteForm.svelte -->
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { BigNumber, utils } from 'ethers';
-	import TokenField from './TokenField.svelte';
+	import { BigNumber, constants, utils } from 'ethers';
+	import type { TokenInfo } from '@uniswap/token-lists';
 	import type { OrderQuoteRequest } from '@cowprotocol/cow-sdk';
 	import { setError } from '$lib/store/error';
-	import { init } from '$lib/store/tokens';
+	import { init, tokensOnThisChain } from '$lib/store/tokens';
+	import { signerAddress } from '$lib/store/chain';
+	import TokenField from './TokenField.svelte';
 
 	// Define the type for the onSubmit prop function
 	type OnSubmitHandler = (quoteRequest: OrderQuoteRequest) => void;
 
 	export let onSubmit: OnSubmitHandler;
-	let sellToken = '';
-	let buyToken = '';
+	let sellToken: TokenInfo;
+	let buyToken: TokenInfo;
 	let from = '';
-	let receiver = '';
+	let receiver = constants.AddressZero;
 	let sellAmountBeforeFee = '';
-	let buyAmountBeforeFee = '';
 	let kind = 'sell';
-
-	// Define the list of available tokens
-	const availableTokens = [
-		{
-			value: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
-			label: 'WETH goerli'
-		},
-		{
-			value: '0x02abbdbaaa7b1bb64b5c878f7ac17f8dda169532',
-			label: 'GNO goerli'
-		}
-		// Add more tokens to the list as needed
-	];
 
 	const kinds = [
 		'sell',
-		'buy'
+		// TODO: 'buy'
 		// Add more kinds as needed
 	];
 
@@ -43,16 +31,24 @@
 
 		// Reset the sellAmountBeforeFee and buyAmountBeforeFee fields
 		sellAmountBeforeFee = '';
-		buyAmountBeforeFee = '';
 	}
+
+	signerAddress.subscribe((address) => {
+		from = address || '';
+	});
 
 	function handleSubmit() {
 		// Validate 'from' and 'receiver' as valid Ethereum addresses using ethers
 		try {
-			from = utils.getAddress(from);
 			receiver = utils.getAddress(receiver);
 		} catch (error) {
 			setError('Please enter a valid Ethereum address.');
+			return;
+		}
+
+		// Validate 'sellToken' and 'buyToken' as valid TokenInfo objects
+		if (!sellToken || !buyToken) {
+			setError('Please select a valid token for both "Sell Token" and "Buy Token" fields.');
 			return;
 		}
 
@@ -69,32 +65,20 @@
 				setError('Please enter a valid positive number for "Sell Amount Before Fee" field.');
 				return;
 			}
-		} else {
-			try {
-				const bigNumberBuyAmount = BigNumber.from(buyAmountBeforeFee);
-				if (bigNumberBuyAmount.lte(0)) {
-					setError('Please enter a valid positive number for "Buy Amount Before Fee" field.');
-					return;
-				}
-				buyAmountBeforeFee = bigNumberBuyAmount.toString(); // Normalize the BigNumber representation
-			} catch (error) {
-				setError('Please enter a valid positive number for "Buy Amount Before Fee" field.');
-				return;
-			}
 		}
 
 		const quoteRequest: OrderQuoteRequest = {
-			sellToken,
-			buyToken,
+			sellToken: sellToken.address,
+			buyToken: buyToken.address,
 			from,
 			receiver,
-			sellAmountBeforeFee,
+			sellAmountBeforeFee: sellAmountBeforeFee.length > 0 ? BigNumber.from(sellAmountBeforeFee).mul(BigNumber.from(10).pow(sellToken.decimals)).toString() : '',
 			kind: kind as OrderQuoteRequest['kind']
 		};
 		onSubmit(quoteRequest);
 	}
 
-	onMount(async () => {
+	onMount(async () => {		
 		// make sure the tokens are initialized
 		init();
 	});
@@ -102,47 +86,38 @@
 
 <div>
 	<form on:submit|preventDefault={handleSubmit}>
-		<!-- Sell Token -->
 		<div class="form-row">
-			<label for="sellToken">Sell Token:</label>
-			<TokenField tokens={availableTokens} bind:selectedToken={sellToken} />
-		</div>
-
-		<!-- Buy Token -->
-		<div class="form-row">
-			<label for="buyToken">Buy Token:</label>
-			<TokenField tokens={availableTokens} bind:selectedToken={buyToken} />
-		</div>
-
-		<div class="form-row">
-			<label for="from">From:</label>
-			<input type="text" id="from" bind:value={from} required />
-		</div>
-		<div class="form-row">
-			<label for="receiver">Receiver:</label>
-			<input type="text" id="receiver" bind:value={receiver} required />
-		</div>
-		{#if kind === 'sell'}
-			<div class="form-row">
-				<label for="sellAmountBeforeFee">Sell Amount (before fee):</label>
-				<input type="text" id="sellAmountBeforeFee" bind:value={sellAmountBeforeFee} required />
-			</div>
-		{:else}
-			<div class="form-row">
-				<label for="buyAmountBeforeFee">Buy Amount (before fee):</label>
-				<input type="text" id="buyAmountBeforeFee" bind:value={buyAmountBeforeFee} required />
-			</div>
-		{/if}
-		<div class="form-row">
-			<label for="kind">Kind:</label>
+			<label for="kind">Order Kind:</label>
 			<select id="kind" bind:value={kind} on:change={handleKindChange} required>
 				{#each kinds as k}
 					<option value={k}>{k}</option>
 				{/each}
 			</select>
 		</div>
+		<!-- Sell Token -->
 		<div class="form-row">
-			<button type="submit">Submit</button>
+			<TokenField label="Sell Token:" tokens={$tokensOnThisChain} bind:selectedToken={sellToken} />
+		</div>
+
+		<!-- Buy Token -->
+		<div class="form-row">
+			<TokenField label="Buy Token:" tokens={$tokensOnThisChain} bind:selectedToken={buyToken} />
+		</div>
+
+		<!-- <div class="form-row">
+			<label for="from">From:</label>
+			<input type="text" id="from" bind:value={from} required />
+		</div>
+		<div class="form-row">
+			<label for="receiver">Receiver:</label>
+			<input type="text" id="receiver" bind:value={receiver} required />
+		</div> -->
+		<div class="form-row">
+			<label for="sellAmountBeforeFee">Sell Amount (before fee):</label>
+			<input type="text" id="sellAmountBeforeFee" bind:value={sellAmountBeforeFee} required />
+		</div>
+		<div class="form-row">
+			<button type="submit">Get Quote</button>
 		</div>
 	</form>
 </div>
