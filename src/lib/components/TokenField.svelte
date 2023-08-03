@@ -15,3 +15,19 @@
 		{/each}
 	</select>
 </label>
+
+<style>
+	label {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 10px;
+	}
+
+	select {
+		padding: 8px;
+		font-size: 16px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		width: 100%;
+	}
+</style>

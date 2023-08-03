@@ -89,7 +89,7 @@
 <WizardPage
 	title="🐮🎶 Composable CoW Toolbox 🧰"
 	leftButton={{ text: 'Back', uri: '/setup' }}
-	rightButton={{ text: 'Next', uri: '/simple-swap' }}
+	rightButton={{ text: 'Conditional Order', uri: '/conditional-order' }}
 >
 	<QuoteForm slot="content" onSubmit={handleQuoteFormSubmit} />
 	<div slot="footer">

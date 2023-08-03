@@ -7,7 +7,7 @@ import type {
 import type SafeAppsSDK from '@rndlabs/safe-apps-sdk';
 import { Safe, EthersAdapter } from '@rndlabs/safe-protocol-kit';
 import { isExtensibleFallbackHandler as isExtensibleFallbackHandlerSdk } from '@cowprotocol/cow-sdk';
-import { derived, writable, type Readable, type Unsubscriber } from 'svelte/store';
+import { derived, writable, type Readable, type Unsubscriber, get } from 'svelte/store';
 import { connected, rpc, chainId } from './chain';
 import { ethers } from 'ethers';
 import { setError } from './error';
@@ -178,6 +178,8 @@ abstract class Monitor<T> {
 		// if tainted (ie. something changed), then save
 		if (this.tainted) {
 			await this.save();
+			// now if we poke `chainId` it should cause all derived stores to refresh
+			safeInfo.set(get(safeInfo));
 			this.tainted = false;
 		}
 	}
