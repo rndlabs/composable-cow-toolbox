@@ -39,7 +39,7 @@
 													to: $signerAddress,
 													value: '0',
 													data: createSetDomainVerifierTx(
-														OrderSigningUtils.getDomainSeparator($chainId),
+														await OrderSigningUtils.getDomainSeparator($chainId),
 														constants.AddressZero
 													)
 												},

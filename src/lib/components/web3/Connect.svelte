@@ -2,8 +2,8 @@
 	import { onMount } from 'svelte';
 	import { init } from '$lib/store/chain';
 	import { safeApp as safeAppStore, safeInfo as safeInfoStore } from '$lib/store/safe';
-	import type { Opts, SafeInfo } from '@rndlabs/safe-apps-sdk';
-	import SafeAppsSDK from '@rndlabs/safe-apps-sdk/dist/src/sdk';
+	import type { Opts, SafeInfo } from '@safe-global/safe-apps-sdk';
+	import SafeAppsSDK from '@safe-global/safe-apps-sdk/dist/src/sdk';
 
 	let pending = false;
 	let triedToConnectToSafe = false;

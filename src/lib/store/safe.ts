@@ -3,9 +3,9 @@ import type {
 	EIP712TypedData,
 	OffChainSignMessageResponse,
 	SafeInfo
-} from '@rndlabs/safe-apps-sdk';
-import type SafeAppsSDK from '@rndlabs/safe-apps-sdk';
-import { Safe, EthersAdapter } from '@rndlabs/safe-protocol-kit';
+} from '@safe-global/safe-apps-sdk';
+import type SafeAppsSDK from '@safe-global/safe-apps-sdk';
+import Safe, { EthersAdapter } from '@safe-global/protocol-kit';
 import { isExtensibleFallbackHandler as isExtensibleFallbackHandlerSdk } from '@cowprotocol/cow-sdk';
 import { derived, writable, type Readable, type Unsubscriber, get } from 'svelte/store';
 import { connected, rpc, chainId } from './chain';
