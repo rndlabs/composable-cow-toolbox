@@ -19,7 +19,9 @@ This is a rapid prototyping toolbox for the Composable Cow project. It is a coll
 1. Clone the repo.
 2. Run `pnpm install` to install dependencies.
 3. Run `pnpm run dev` to start the dev server.
-4. Add the Custom App in your `Safe`: https://localhost:5173
+4. Add the Custom App in your `Safe`: https://localhost:5173 
+
+**NOTE**: If the page takes too long to load, this may be because the first time you load the localhost via SSL, you have to manually trust the development server's self-generated SSL certificate.
 
 ### Repo structure
 
