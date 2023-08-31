@@ -1,38 +1,30 @@
-# create-svelte
+# Composable Cow Toolbox
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+## What is this?
 
-## Creating a project
+This is a rapid prototyping toolbox for the Composable Cow project. It is a collection of tools that can be used to quickly create and test new ideas. It is not intended to be a production-ready application.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+1. Upgrading of `Safe` to `ExtensibleFallbackHandler` + `ComposableCoW` domain verifier.
+2. Reversion of the `Safe` back to the stock (supports 1.3.0 `Safe`) fallback handler.
+3. Placement of simple swaps via off-chain signature aggregation (using `Safe`'s signed messages). No more setPreSignature!.
+4. Placement of a single conditional order (with selectable type).
+5. Placement of multiple conditional orders (WIP).
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+## Developers
 
-## Developing
+### Setup
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+1. Clone the repo.
+2. Run `pnpm install` to install dependencies.
+3. Run `pnpm run dev` to start the dev server.
+4. Add the Custom App in your `Safe`: https://localhost:5173
 
-```bash
-npm run dev
+### Repo structure
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+This repository favours moving fast and rapid prototyping. As simple a possible state is maintained, with an opinionated stack:
 
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+1. Use of `pnpm` for package management.
+2. Use of `sveltekit` for CSR and routing.
+3. Use of `vite` for bundling.
