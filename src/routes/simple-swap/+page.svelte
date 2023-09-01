@@ -16,6 +16,7 @@
 	import WizardPage from '$lib/components/WizardPage.svelte';
 	import QuoteView from '$lib/components/QuoteView.svelte';
 	import QuoteForm from '$lib/components/QuoteForm.svelte';
+	import type { EIP712TypedData, TypedDataDomain } from '@safe-global/safe-apps-sdk';
 
 	let orderBookApi: OrderBookApi;
 	$: {
@@ -56,19 +57,31 @@
 
 		const gpv2SettlementDomain = await OrderSigningUtils.getDomain($chainId!);
 
+		// a function that removes the signingScheme property from a message
+		const removeSigningScheme = (msg: any) => {
+			const { signingScheme, ...rest } = msg;
+			return rest;
+		};
+
+
+		const domain: TypedDataDomain = {
+			...gpv2SettlementDomain,
+			chainId: String(gpv2SettlementDomain.chainId),
+		};
+
+		const msg: EIP712TypedData = {
+			types: OrderSigningUtils.getEIP712Types(),
+			message: removeSigningScheme(quote.quote),
+			domain: domain
+		};
+
+		const toSwapMessage = {
+			description: 'Swap',
+			msg: msg
+		};
+
 		$sigMonitor?.add(
-			{
-				description: 'Swap',
-				msg: {
-					domain: {
-						...gpv2SettlementDomain,
-						chainId: String(gpv2SettlementDomain.chainId),
-						salt: undefined
-					},
-					types: OrderSigningUtils.getEIP712Types(),
-					message: quote.quote
-				}
-			},
+			toSwapMessage,
 			// callback for submitting the order to the orderbook
 			async (hash: string) => {
 				// get the message from the sig monitor

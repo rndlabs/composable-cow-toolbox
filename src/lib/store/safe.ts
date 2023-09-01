@@ -83,7 +83,7 @@ const fallbackHandler: Readable<string | undefined> = derived([safe], ([$safe], 
 				set(handler);
 			})
 			.catch((e) => {
-				throw new Error(e);
+				setError(e);
 			});
 	} else {
 		set(undefined);
